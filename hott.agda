@@ -105,7 +105,6 @@ comp = λ g f x → g (f x)
 _∘_ = comp
 infix 9 _∘_
 
--- Composition of Functions is Associative
 _ : {A : 𝓤 i} {B : 𝓤 j} {C : 𝓤 j} {D : 𝓤 l}
   → (f : A ⇒ B)
   → (g : B ⇒ C)
@@ -113,19 +112,17 @@ _ : {A : 𝓤 i} {B : 𝓤 j} {C : 𝓤 j} {D : 𝓤 l}
   → (h ∘ g) ∘ f ≐ h ∘ (g ∘ f)
 _ = λ f g h → equal
 
+_ : {A : 𝓤 i} {B : 𝓤 j}
+  → (f : A ⇒ B)
+  → id ∘ f ≐ f
+_ = λ f → equal
+
+_ : {A : 𝓤 i} {B : 𝓤 j}
+  → (f : A ⇒ B)
+  → f ∘ id ≐ f
+_ = λ f → equal
+
 {-
-
--- Left and Right Unit Laws
-_ : {A : 𝓤 i} {B : 𝓤 j}
-  → (f : A ⇒ B)
-  → id {B} ∘ f ≐ f
-_ = λ f → equal
-
-_ : {A : 𝓤 i} {B : 𝓤 j}
-  → (f : A ⇒ B)
-  → f ∘ id {A} ≐ f
-_ = λ f → equal
-
 -- Exercises
 _ : {A : 𝓤 i} {B : A → Type}
   → (f g : Π[ x ⦂ A ] B x)
