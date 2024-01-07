@@ -1,6 +1,9 @@
 Some scratch from ⟨ Introduction to Homotopy Type Theory >
 
 ```
+
+{-# OPTIONS --without-K --safe #-}
+
 module HoTT where
 
 open import Agda.Primitive using (Level; lzero; lsuc; _⊔_)
@@ -22,72 +25,6 @@ Jugemental Equality
 data _≐_ {A : 𝓤 i} (x : A) : A → 𝓤 i where
   equal : x ≐ x
 infix 4 _≐_
-
-postulate
-  ext : {A : 𝓤 i} {B : A → 𝓤 j} {f g : (x : A) → B x}
-    → ((x : A) → f x ≐ g x)
-      -------------------
-    → (λ x → f x) ≐ (λ x → g x)
-
-ƛ : {A : 𝓤 i} {B : A → 𝓤 j}
-  → ((x : A) → B x)
-    ---------------
-  → Π[ x ⦂ A ] B x
-ƛ b = λ x → b x
-
-ƛ-eq : {A : 𝓤 i} {B : A → 𝓤 j} {b b′ : (x : A) → B x}
-  → ((x : A) → b x ≐ b′ x)
-    --------------------------
-  → (λ x → b x) ≐ (λ x → b′ x)
-ƛ-eq = ext
-
-ev : {A : 𝓤 i} {B : A → 𝓤 j}
-  → (f : Π[ x ⦂ A ] B x)
-    -------------------
-  → (x : A) → B x
-ev f x = f x
-
-ev-eq : {A : 𝓤 i} {B : A → 𝓤 j} {f f′ : Π[ x ⦂ A ] B x}
-  → f ≐ f′
-    --------------------
-  → (x : A) → f x ≐ f′ x
-ev-eq equal x = equal
-
-β : {A : 𝓤 i} {B : A → 𝓤 j}
-  → (b : (x : A) → B x)
-    -----------------------------
-  → (x : A) → (λ y → b y) x ≐ b x
-β b x = equal
-
-η : {A : 𝓤 i} {B : A → 𝓤 j}
-  → (f : Π[ x ⦂ A ] B x)
-    --------------------
-  → (λ x → f x) ≐ f
-η = λ f → equal
-
-ƛ-f : {A : 𝓤 i} {B : 𝓤 j}
-  → ((x : A) → B)
-    -------------
-  → A ⇒ B
-ƛ-f = ƛ
-
-ev-f : {A : 𝓤 i} {B : 𝓤 j}
-  → (f : A ⇒ B)
-    -----------
-  → (x : A) → B
-ev-f = ev
-
-β-f : {A : 𝓤 i} {B : 𝓤 j}
-  → (b : (x : A) → B)
-    -----------------------------
-  → (x : A) → (λ y → b y) x ≐ b x
-β-f = β
-
-η-f : {A : 𝓤 i} {B : 𝓤 j}
-  → (f : A ⇒ B)
-    ---------------
-  → (λ x → f x) ≐ f
-η-f = η
 
 _ : {A : 𝓤 i}
   → id A ≐ (λ x → x)
@@ -135,6 +72,11 @@ indℕ = ℕ-ind
     ----------------------------------------------------
   → (n : ℕ) → indℕ p₀ pₛ (succℕ n) ≐ pₛ n (indℕ p₀ pₛ n)
 ℕ-comp-pₛ p₀ pₛ n = equal
+
+ind𝟙 : {P : 𝟙 → 𝓤 i}
+  → P *
+  → ((x : 𝟙) → P x)
+ind𝟙 p * = p
 
 𝟙-comp : {P : 𝟙 → 𝓤 i}
   → (p* : P *)
@@ -250,3 +192,4 @@ apd : {A : 𝓤 i} {B : A → 𝓤 j} {x y : A}
   → (p : x ≡ y)
   → tr B p (f x) ≡ f y
 apd f (refl x) = refl (f x)
+

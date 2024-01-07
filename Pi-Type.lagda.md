@@ -1,6 +1,9 @@
 Depdendent Function Type - Π Type
 
 ```
+
+{-# OPTIONS --without-K --safe #-}
+
 module Pi-Type where
 
 open import Agda.Primitive using (Level; lzero; lsuc; _⊔_)
