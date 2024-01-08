@@ -1,6 +1,9 @@
 Empty Type - Φ
 
 ```agda
+
+{-# OPTIONS --without-K --safe #-}
+
 module Empty-Type where
 
 open import Agda.Primitive using (Level; lzero; lsuc; _⊔_)

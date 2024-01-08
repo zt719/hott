@@ -15,6 +15,7 @@ open import Unit-Type
 open import Coproduct-Type
 open import Sigma-Type
 open import Identity-Type
+open import Empty-Type
 
 variable i j k l : Level
 ```
@@ -31,19 +32,19 @@ _ : {A : 𝓤 i}
 _ = equal
 
 _ : {A : 𝓤 i} {B : 𝓤 j} {C : 𝓤 j} {D : 𝓤 l}
-  → (f : A ⇒ B)
-  → (g : B ⇒ C)
-  → (h : C ⇒ D)
+  → (f : A → B)
+  → (g : B → C)
+  → (h : C → D)
   → (h ∘ g) ∘ f ≐ h ∘ (g ∘ f)
 _ = λ f g h → equal
 
 _ : {A : 𝓤 i} {B : 𝓤 j}
-  → (f : A ⇒ B)
+  → (f : A → B)
   → id B ∘ f ≐ f
 _ = λ f → equal
 
 _ : {A : 𝓤 i} {B : 𝓤 j}
-  → (f : A ⇒ B)
+  → (f : A → B)
   → f ∘ id A ≐ f
 _ = λ f → equal
 
@@ -192,4 +193,92 @@ apd : {A : 𝓤 i} {B : A → 𝓤 j} {x y : A}
   → (p : x ≡ y)
   → tr B p (f x) ≡ f y
 apd f (refl x) = refl (f x)
+
+Eqℕ : ℕ → ℕ → 𝓤₀
+Eqℕ 0ℕ 0ℕ = 𝟙
+Eqℕ 0ℕ (succℕ n) = Φ
+Eqℕ (succℕ m) 0ℕ = Φ
+Eqℕ (succℕ m) (succℕ n) = Eqℕ m n
+
+E₀ : ℕ → 𝓤₀
+E₀ 0ℕ = 𝟙
+E₀ (succℕ n) = Φ
+
+Eₛ : ℕ → (ℕ → 𝓤₀) → ℕ → 𝓤₀
+Eₛ m X 0ℕ = Φ
+Eₛ m X (succℕ n) = X n
+
+E₀≐ : {m : ℕ}
+  → Eqℕ 0ℕ m ≐ E₀ m
+E₀≐ {0ℕ} = equal
+E₀≐ {succℕ m} = equal
+
+Eₛ≐ : {m n : ℕ}
+  → Eqℕ (succℕ m) n ≐ Eₛ m (Eqℕ m) n
+Eₛ≐ {n = 0ℕ} = equal
+Eₛ≐ {n = succℕ m} = equal
+
+refl-Eqℕ : Π[ n ⦂ ℕ ] Eqℕ n n
+refl-Eqℕ 0ℕ = *
+refl-Eqℕ (succℕ n) = refl-Eqℕ n
+
+_↔_ : 𝓤 i → 𝓤 i → 𝓤 i
+A ↔ B = (A → B) × (B → A)
+
+≡↔Eqℕ : {m n : ℕ}
+  → (m ≡ n) ↔ Eqℕ m n
+≡↔Eqℕ {m} {n} = (λ { (refl .m) → refl-Eqℕ m }) , f
+  where
+    f : {m n : ℕ} → Eqℕ m n → (m ≡ n)
+    f {0ℕ} {0ℕ} = λ * → refl 0ℕ
+    f {0ℕ} {succℕ n} = λ ()
+    f {succℕ m} {0ℕ} = λ ()
+    f {succℕ m} {succℕ n} = id (succℕ m ≡ succℕ n) ∘ ap succℕ ∘ f {m} {n}
+
+p7 : {m n : ℕ}
+  → (m ≡ n) ↔ (succℕ m ≡ succℕ n)
+p7 {m} {n} = (ap succℕ) , (pr₂ ≡↔Eqℕ ∘  pr₁ ≡↔Eqℕ)
+
+¬_ : 𝓤 i → 𝓤 i
+¬ A = A → Φ
+
+_≢_ : {A : 𝓤 i} → A → A → 𝓤 i
+x ≢ y = ¬ (x ≡ y)
+
+p8 : {n : ℕ}
+  → 0ℕ ≢ succℕ n
+p8 {n} = pr₁ (≡↔Eqℕ {n = succℕ n})
+
+e6-1a1 : {m n k : ℕ}
+  → (m ≡ n) ↔ (m + k ≡ n + k)
+e6-1a1 {m} {n} {k} = (ap (_+ k)) , (pr₂ ≡↔Eqℕ ∘ f {m} {n} {k} ∘ pr₁ ≡↔Eqℕ)
+  where
+  f : {m n k : ℕ}
+    → Eqℕ (m + k) (n + k) → Eqℕ m n
+  f {m} {n} {0ℕ} = id (Eqℕ m n)
+  f {m} {n} {succℕ k} = f {k = k}
+
+{-
+e6-1a2 : {m n k : ℕ}
+  → (m ≡ n) ↔ (m · succℕ k ≡ n · succℕ k)
+e6-1a2 {m} {n} {k} = ap (_· succℕ k) , (pr₂ ≡↔Eqℕ ∘ f {m} {n} {k} ∘ pr₁ ≡↔Eqℕ)
+  where
+  f : {m n k : ℕ}
+    → Eqℕ (m · succℕ k) (n · succℕ k) → Eqℕ m n
+  f {m} {n} {0ℕ} = id (Eqℕ m n)
+  f {m} {n} {succℕ k} = {!!}
+-}
+
+e6-1b1 : {m n : ℕ}
+  → (m + n ≡ 0) ↔ ((m ≡ 0) × (n ≡ 0))
+e6-1b1 {m} {n} = ({!? ∘ f!} ∘ pr₁ ≡↔Eqℕ) , {!!}
+  where
+  f : {m n : ℕ}
+    → Eqℕ (m + n) 0 → (Eqℕ m 0 × Eqℕ n 0)
+  f {0ℕ} {0ℕ} = λ * → * , *
+  f {0ℕ} {succℕ n} = λ ()
+  f {succℕ m} {0ℕ} = λ ()
+  f {succℕ m} {succℕ n} = λ ()
+
+
 

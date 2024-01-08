@@ -30,7 +30,7 @@ comp : {A : 𝓤 i} {B : 𝓤 j} {C : 𝓤 k}
 comp = λ g f x → g (f x)
 
 _∘_ = comp
-infix 9 _∘_
+infixr 9 _∘_
 
 const : {A : 𝓤 i} {B : 𝓤 j}
   → B
