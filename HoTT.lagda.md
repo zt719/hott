@@ -9,6 +9,7 @@ module HoTT where
 open import Agda.Primitive using (Level; lzero; lsuc; _⊔_)
                            renaming (Set to 𝓤)
 
+open import Judgmental
 open import Pi-Type
 open import Natural-Type
 open import Unit-Type
@@ -17,93 +18,12 @@ open import Sigma-Type
 open import Identity-Type
 open import Empty-Type
 
-variable i j k l : Level
+private variable i j k l : Level
 ```
 
-Jugemental Equality
+```agda
 
-```
-data _≐_ {A : 𝓤 i} (x : A) : A → 𝓤 i where
-  equal : x ≐ x
-infix 4 _≐_
 
-_ : {A : 𝓤 i}
-  → id A ≐ (λ x → x)
-_ = equal
-
-_ : {A : 𝓤 i} {B : 𝓤 j} {C : 𝓤 j} {D : 𝓤 l}
-  → (f : A → B)
-  → (g : B → C)
-  → (h : C → D)
-  → (h ∘ g) ∘ f ≐ h ∘ (g ∘ f)
-_ = λ f g h → equal
-
-_ : {A : 𝓤 i} {B : 𝓤 j}
-  → (f : A → B)
-  → id B ∘ f ≐ f
-_ = λ f → equal
-
-_ : {A : 𝓤 i} {B : 𝓤 j}
-  → (f : A → B)
-  → f ∘ id A ≐ f
-_ = λ f → equal
-
-ℕ-ind : {P : ℕ → 𝓤 i}
-  → P 0ℕ
-  → Π[ n ⦂ ℕ ] (P n ⇒ P (succℕ n))
-    ------------------------------
-  → Π[ n ⦂ ℕ ] P n
-ℕ-ind p₀ pₛ 0ℕ = p₀
-ℕ-ind p₀ pₛ (succℕ n) = pₛ n (ℕ-ind p₀ pₛ n)
-
-indℕ : {P : ℕ → 𝓤 i}
-  → P 0ℕ ⇒ Π[ n ⦂ ℕ ] (P n ⇒ P (succℕ n)) ⇒ Π[ n ⦂ ℕ ] P n
-indℕ = ℕ-ind
-
-ℕ-comp-p₀ : {P : ℕ → 𝓤 i}
-  → (p₀ : P 0ℕ)
-  → (pₛ : Π[ n ⦂ ℕ ] (P n ⇒ P (succℕ n)))
-    -------------------------------------
-  → indℕ p₀ pₛ 0ℕ ≐ p₀
-ℕ-comp-p₀ p₀ pₛ = equal
-
-ℕ-comp-pₛ : {P : ℕ → 𝓤 i}
-  → (p₀ : P 0ℕ)
-  → (pₛ : Π[ n ⦂ ℕ ] (P n ⇒ P (succℕ n)))
-    ----------------------------------------------------
-  → (n : ℕ) → indℕ p₀ pₛ (succℕ n) ≐ pₛ n (indℕ p₀ pₛ n)
-ℕ-comp-pₛ p₀ pₛ n = equal
-
-ind𝟙 : {P : 𝟙 → 𝓤 i}
-  → P *
-  → ((x : 𝟙) → P x)
-ind𝟙 p * = p
-
-𝟙-comp : {P : 𝟙 → 𝓤 i}
-  → (p* : P *)
-  → ind𝟙 {i} {P} p* * ≐ p*
-𝟙-comp = λ p* → equal
-
-ind∔ : {A : 𝓤 i} {B : 𝓤 j} {P : A ∔ B → 𝓤 k}
-  → Π[ x ⦂ A ] P (inl x) ⇒ Π[ y ⦂ B ] P (inr y) ⇒ Π[ z ⦂ A ∔ B ] P z
-ind∔ f g (inl x) = f x
-ind∔ f g (inr y) = g y
-
-indΣ : {A : 𝓤 i} {B : A → 𝓤 j} {P : Σ[ x ⦂ A ] B x → 𝓤 k}
-  → Π[ x ⦂ A ] Π[ y ⦂ B x ] P (x , y) ⇒ Π[ z ⦂ Σ[ x ⦂ A ] B x ] P z
-indΣ f (x , y) = f x y
-
-curry = indΣ
-
-ev-pair : {A : 𝓤 i} {B : A → 𝓤 j} {P : Σ[ x ⦂ A ] B x → 𝓤 k}
-  → Π[ z ⦂ Σ[ x ⦂ A ] B x ] P z ⇒ Π[ x ⦂ A ] Π[ y ⦂ B x ] P (x , y)
-ev-pair f x y = f (x , y)
-
-uncurry = ev-pair
-
-ind× : {A : 𝓤 i} {B : 𝓤 j} {P : A × B → 𝓤 k}
-  → Π[ x ⦂ A ] Π[ y ⦂ B ] P (x , y) ⇒ Π[ z ⦂ A × B ] P z
-ind× f (x , y) = f x y
 
 ind-eqₐ : {A : 𝓤 i} {a : A} {P : (x : A) → a ≡ x → 𝓤 j}
   → P a (refl a) ⇒ Π[ x ⦂ A ] Π[ p ⦂ a ≡ x ] P x p
@@ -158,7 +78,7 @@ right-inv-≡ (refl x) = refl (refl x)
 ap-id : {A : 𝓤 i}
   → {x y : A}
   → (p : x ≡ y)
-  → p ≡ ap (id A)  p
+  → p ≡ ap id p
 ap-id (refl x) = refl (refl x)
 
 ap-comp : {A : 𝓤 i} {B : 𝓤 j} {C : 𝓤 k}
@@ -233,14 +153,11 @@ A ↔ B = (A → B) × (B → A)
     f {0ℕ} {0ℕ} = λ * → refl 0ℕ
     f {0ℕ} {succℕ n} = λ ()
     f {succℕ m} {0ℕ} = λ ()
-    f {succℕ m} {succℕ n} = id (succℕ m ≡ succℕ n) ∘ ap succℕ ∘ f {m} {n}
+    f {succℕ m} {succℕ n} = id ∘ ap succℕ ∘ f {m} {n}
 
 p7 : {m n : ℕ}
   → (m ≡ n) ↔ (succℕ m ≡ succℕ n)
 p7 {m} {n} = (ap succℕ) , (pr₂ ≡↔Eqℕ ∘  pr₁ ≡↔Eqℕ)
-
-¬_ : 𝓤 i → 𝓤 i
-¬ A = A → Φ
 
 _≢_ : {A : 𝓤 i} → A → A → 𝓤 i
 x ≢ y = ¬ (x ≡ y)
@@ -255,7 +172,7 @@ e6-1a1 {m} {n} {k} = (ap (_+ k)) , (pr₂ ≡↔Eqℕ ∘ f {m} {n} {k} ∘ pr�
   where
   f : {m n k : ℕ}
     → Eqℕ (m + k) (n + k) → Eqℕ m n
-  f {m} {n} {0ℕ} = id (Eqℕ m n)
+  f {m} {n} {0ℕ} = id
   f {m} {n} {succℕ k} = f {k = k}
 
 {-
@@ -268,17 +185,4 @@ e6-1a2 {m} {n} {k} = ap (_· succℕ k) , (pr₂ ≡↔Eqℕ ∘ f {m} {n} {k} �
   f {m} {n} {0ℕ} = id (Eqℕ m n)
   f {m} {n} {succℕ k} = {!!}
 -}
-
-e6-1b1 : {m n : ℕ}
-  → (m + n ≡ 0) ↔ ((m ≡ 0) × (n ≡ 0))
-e6-1b1 {m} {n} = ({!? ∘ f!} ∘ pr₁ ≡↔Eqℕ) , {!!}
-  where
-  f : {m n : ℕ}
-    → Eqℕ (m + n) 0 → (Eqℕ m 0 × Eqℕ n 0)
-  f {0ℕ} {0ℕ} = λ * → * , *
-  f {0ℕ} {succℕ n} = λ ()
-  f {succℕ m} {0ℕ} = λ ()
-  f {succℕ m} {succℕ n} = λ ()
-
-
 

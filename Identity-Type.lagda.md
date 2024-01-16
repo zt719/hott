@@ -38,6 +38,6 @@ tr : {A : 𝓤 i}
   → {x y : A}
   → x ≡ y
   → B x → B y
-tr B (refl x) = id (B x)
+tr B (refl x) = id
 
 ```
