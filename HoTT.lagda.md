@@ -9,14 +9,13 @@ module HoTT where
 open import Agda.Primitive using (Level; lzero; lsuc; _⊔_)
                            renaming (Set to 𝓤)
 
-open import Judgmental
-open import Pi-Type
-open import Natural-Type
-open import Unit-Type
-open import Coproduct-Type
-open import Sigma-Type
-open import Identity-Type
-open import Empty-Type
+open import Products
+open import Naturals
+open import Unit
+open import Sums
+open import Products
+open import Identity
+open import Empty
 
 private variable i j k l : Level
 ```

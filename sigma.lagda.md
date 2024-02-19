@@ -1,20 +1,22 @@
 ```agda
 {-# OPTIONS --without-K --safe #-}
 
-module Sigma-Type where
+module Sigma where
 
-open import Agda.Primitive using (Level; lzero; lsuc; _⊔_)
-                           renaming (Set to 𝓤)
+open import Agda.Primitive
+  using (Level; lzero; lsuc; _⊔_)
+  renaming (Set to 𝓤)
+open import Agda.Builtin.Equality
+  renaming (_≡_ to _≐_; refl to equal)
 
-open import Judgmental
-open import Pi-Type
+open import Pi
+open import Boolean
 
 private variable i j k : Level
 
 data Σ (A : 𝓤 i) (B : A → 𝓤 j) : 𝓤 (i ⊔ j) where
-  _,_ : Π[ x ⦂ A ] (B x ⇒ Σ A B)
-infixr 0  _,_
-
+  _,_ : Π[ x ⦂ A ] (B x → Σ A B)
+infixr 4  _,_
 syntax Σ A (λ x → b) = Σ[ x ⦂ A ] b
 
 indΣ : {A : 𝓤 i} {B : A → 𝓤 j} {P : Σ[ x ⦂ A ] B x → 𝓤 k}
@@ -32,7 +34,8 @@ pr₂ (x , y) = y
 curry = indΣ
 
 ev-pair : {A : 𝓤 i} {B : A → 𝓤 j} {P : Σ[ x ⦂ A ] B x → 𝓤 k}
-  → Π[ z ⦂ Σ[ x ⦂ A ] B x ] P z ⇒ Π[ x ⦂ A ] Π[ y ⦂ B x ] P (x , y)
+  → Π[ z ⦂ Σ[ x ⦂ A ] B x ] P z
+  → Π[ x ⦂ A ] Π[ y ⦂ B x ] P (x , y)
 ev-pair f x y = f (x , y)
 
 uncurry = ev-pair
@@ -46,19 +49,7 @@ A × B = Σ[ x ⦂ A ] B
 infix  2 _×_
 
 ind× : {A : 𝓤 i} {B : 𝓤 j} {P : A × B → 𝓤 k}
-  → Π[ x ⦂ A ] Π[ y ⦂ B ] P (x , y) ⇒ Π[ z ⦂ A × B ] P z
+  → Π[ x ⦂ A ] Π[ y ⦂ B ] P (x , y) → Π[ z ⦂ A × B ] P z
 ind× f (x , y) = f x y
 
-comp× : {A : 𝓤 i} {B : 𝓤 j} {P : A × B → 𝓤 k}
-  → (g : Π[ x ⦂ A ] Π[ y ⦂ B ] P (x , y))
-  → (x : A)
-  → (y : B)
-  → ind× {A = A} {B = B} {P = P} g (x , y) ≐ (g x y)
-comp× = λ g x y → equal
-
 ```
-
-Binary Sigma Type
-
-
-```agda
