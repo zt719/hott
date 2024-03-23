@@ -68,9 +68,10 @@ _+_ = addℕ
 infixl 6 _+_
 
 mulℕ : ℕ → ℕ → ℕ
-mulℕ m 0ℕ = 0ℕ
-mulℕ m (succℕ n) = addℕ m (mulℕ m n)
+mulℕ 0ℕ n = 0ℕ
+mulℕ (succℕ m) n = addℕ (mulℕ m n) n
 
-_·_ = mulℕ
-infixl 7 _·_
+_*_ = mulℕ
+infixl 7 _*_
+
 ```

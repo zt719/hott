@@ -39,6 +39,8 @@ neg-Bool : Bool → Bool
 neg-Bool false = true
 neg-Bool true = false
 
+
+
 {-
 _∧_
 _∨_

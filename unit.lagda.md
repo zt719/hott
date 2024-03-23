@@ -13,9 +13,9 @@ private variable i : Level
 
 -- 𝟙-formation Rule
 data 𝟙 : 𝓤₀ where
-  * : 𝟙
+  ＊ : 𝟙
 
 ind𝟙 : {P : 𝟙 → 𝓤 i}
-  → P * → (x : 𝟙) → P x
-ind𝟙 p * = p
+  → P ＊ → (x : 𝟙) → P x
+ind𝟙 p ＊ = p
 ```

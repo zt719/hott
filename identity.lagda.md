@@ -13,6 +13,7 @@ open import Agda.Primitive
 open import Pi
 open import Sigma
 open import Naturals
+open import Empty
 
 private variable i j k : Level
 
@@ -20,14 +21,20 @@ data _≡_ {A : 𝓤 i} : A → A → 𝓤 i where
   refl : Π[ a ⦂ A ] (a ≡ a)
 infix  4 _≡_
 
-ind≡ : {A : 𝓤 i} {a : A} {P : (x : A) (p : a ≡ x) → 𝓤 j}
+_≢_ : {A : 𝓤 i}
+  → A → A → 𝓤 i
+A ≢ B = ¬ (A ≡ B)
+infix  4 _≢_
+
+ind≡ : {A : 𝓤 i} {a : A} {P : Π[ x ⦂ A ] Π[ p ⦂ a ≡ x ] 𝓤 j}
   → P a (refl a) ⇒ Π[ x ⦂ A ] Π[ p ⦂ a ≡ x ] (P x p)
 ind≡ p a (refl a) = p
 
 concat : {A : 𝓤 i}
   → Π'[ x , y , z ⦂ A ] (x ≡ y ⇒ y ≡ z ⇒ x ≡ z)
-concat {x = x} {y = y} {z = z} (refl x) (refl x) = refl x
+concat (refl x) (refl x) = refl x
 
+{-
 concat′ : {A : 𝓤 i} 
   → Π'[ x , y , z ⦂ A ] (x ≡ y ⇒ y ≡ z ⇒ x ≡ z)
 concat′ {x = x} {y = y} {z = z} p q = f x y p z q
@@ -35,6 +42,7 @@ concat′ {x = x} {y = y} {z = z} p q = f x y p z q
     f : {A : 𝓤 i }
       → Π[ x , y ⦂ A ] (x ≡ y ⇒ Π[ z ⦂ A ] (y ≡ z ⇒ x ≡ z))
     f x = ind≡ (λ z → id (x ≡ z))
+-}
     
 _∙_ = concat
 infixl 7 _∙_
@@ -49,7 +57,7 @@ infix 40 _⁻¹
 assoc : {A : 𝓤 i}
   → Π'[ x , y , z , w ⦂ A ] Π[ p ⦂ x ≡ y ] Π[ q ⦂ y ≡ z ] Π[ r ⦂ z ≡ w ]
     ((p ∙ q) ∙ r ≡ p ∙ (q ∙ r))
-assoc {x = x} {y = y} (refl x) (refl x) (refl x) = refl (refl x)
+assoc (refl x) (refl x) (refl x) = refl (refl x)
 
 left-unit : {A : 𝓤 i}
   → Π'[ x , y ⦂ A ] Π[ p ⦂ x ≡ y ] (refl x ∙ p ≡ p)
@@ -74,7 +82,7 @@ ap : {A : 𝓤 i} {B : 𝓤 j}
 ap f (refl x) = refl (f x)
 
 ap-id : {A : 𝓤 i}
-  → Π'[ x , y ⦂ A ] Π[ p ⦂ x ≡ y ] (p ≡ ap (id A) p)
+  → Π'[ x , y ⦂ A ] Π[ p ⦂ x ≡ y ] (p ≡ ap id p)
 ap-id (refl x) = refl (refl x)
 
 ap-comp : {A : 𝓤 i} {B : 𝓤 j} {C : 𝓤 k}
@@ -103,7 +111,7 @@ ap-concat f (refl x) (refl x) = refl (ap f (refl x))
 tr : {A : 𝓤 i}
   → (B : A → 𝓤 j)
   → Π'[ x , y ⦂ A ] (x ≡ y ⇒ B x ⇒ B y)
-tr B (refl x) = id (B x)
+tr B (refl x) = id
 
 apd : {A : 𝓤 i} {B : A → 𝓤 j}
   → (f : Π[ a ⦂ A ] B a)
@@ -115,13 +123,14 @@ apd f (refl x) = refl (f x)
 prop551 : {A : 𝓤 i}
   → (a : A)
   → (y : Σ[ x ⦂ A ] (a ≡ x))
-  → Σ[ p ⦂  Σ[ x ⦂ A ] (a ≡ x) ] (p ≡ y)
-prop551 a (a , refl a) = (a , refl a) , refl (a , refl a)
+  → (a , refl a) ≡ y 
+prop551 a (a , refl a) = refl (a , refl a)
 
 --5.6 The laws of addition on ℕ
 left-unit-law-addℕ : 
   Π[ n ⦂ ℕ ] (0 + n ≡ n)
-left-unit-law-addℕ = indℕ (refl 0ℕ) (λ _ p → ap succℕ p)
+left-unit-law-addℕ 0ℕ = refl 0ℕ
+left-unit-law-addℕ (succℕ n) = ap succℕ (left-unit-law-addℕ n)
 
 right-unit-law-addℕ :
   Π[ n ⦂ ℕ ] (n + 0 ≡ n)
@@ -129,8 +138,8 @@ right-unit-law-addℕ n = refl n
 
 left-successor-law-addℕ :
   Π[ m , n ⦂ ℕ ] (succℕ m + n ≡ succℕ (m + n))
-left-successor-law-addℕ m =
-  indℕ (refl (succℕ m)) (λ _ p → ap succℕ p)
+left-successor-law-addℕ m 0ℕ = refl (succℕ m)
+left-successor-law-addℕ m (succℕ n) = ap succℕ (left-successor-law-addℕ m n)
 
 right-successor-law-addℕ :
   Π[ m , n ⦂ ℕ ] (m + succℕ n ≡ succℕ (m + n))
@@ -138,15 +147,13 @@ right-successor-law-addℕ m n = refl (succℕ (m + n))
 
 associative-addℕ :
   Π[ m , n , k ⦂ ℕ ] ((m + n) + k ≡ m + (n + k))
-associative-addℕ m n =
-  indℕ (refl (m + n)) (λ _ p → ap succℕ p)
+associative-addℕ m n 0ℕ = refl (addℕ m n)
+associative-addℕ m n (succℕ k) = ap succℕ (associative-addℕ m n k)
 
 commutative-addℕ :
   Π[ m , n ⦂ ℕ ] (m + n ≡ n + m)
-commutative-addℕ m =
-  indℕ
-    (right-unit-law-addℕ m ∙ (left-unit-law-addℕ m ⁻¹))
-    (λ n p → ap succℕ p ∙ (left-successor-law-addℕ n m ⁻¹))
+commutative-addℕ 0ℕ n = left-unit-law-addℕ n
+commutative-addℕ (succℕ m) n = left-successor-law-addℕ m n ∙ ap succℕ (commutative-addℕ m n)
 
 distributive-inv-concat : {A : 𝓤 i}
   → Π'[ x , y , z ⦂ A ] Π[ p ⦂ x ≡ y ] Π[ q ⦂ y ≡ z ]
@@ -157,4 +164,62 @@ inv-con : {A : 𝓤 i}
   → Π'[ x , y , z ⦂ A ] Π[ p ⦂ x ≡ y ] Π[ q ⦂ y ≡ z ] Π[ r ⦂ x ≡ z ] ((p ∙ q ≡ r) ⇒ (q ≡ p ⁻¹ ∙ r))
 inv-con (refl x) (refl x) (refl x) (refl (refl x)) =
   refl (refl x)
+
+lift : {A : 𝓤 i}
+  → (B : A → 𝓤 j)
+  → Π'[ a , x ⦂ A ] Π[ p ⦂ a ≡ x ] Π[ b ⦂ B a ]
+    ((a , b) ≡ (x , tr B p b))
+lift B (refl a) b = refl (a , b)
+
+Mac-Lane-pentagon : {A : 𝓤 i} →
+  Π'[ a , b , c , d , e ⦂ A ]
+  Π[ p ⦂ a ≡ b ] Π[ q ⦂ b ≡ c ] Π[ r ⦂ c ≡ d ] Π[ s ⦂ d ≡ e ]
+  let α₁ = (ap (λ t → t ∙ s) (assoc p q r))
+      α₂ = (assoc p (q ∙ r) s)
+      α₃ = (ap (λ t → p ∙ t) (assoc q r s))
+      α₄ = (assoc (p ∙ q) r s)
+      α₅ = (assoc p q (r ∙ s))
+  in ((α₁ ∙ α₂) ∙ α₃) ≡ (α₄ ∙ α₅)
+Mac-Lane-pentagon (refl x) (refl x) (refl x) (refl x) = refl (refl (refl x))
+
+left-unit-law-mulℕ :
+  Π[ m ⦂ ℕ ] (0ℕ * m ≡ 0ℕ)
+left-unit-law-mulℕ m = refl 0ℕ
+
+right-unit-law-mulℕ :
+  Π[ m ⦂ ℕ ] (m * 0ℕ ≡ 0ℕ)
+right-unit-law-mulℕ 0ℕ = refl 0ℕ
+right-unit-law-mulℕ (succℕ m) = right-unit-law-mulℕ m
+
+left-id-law-mulℕ :
+  Π[ m ⦂ ℕ ] (1 * m ≡ m)
+left-id-law-mulℕ 0ℕ = refl 0ℕ
+left-id-law-mulℕ (succℕ m) = ap succℕ (left-id-law-mulℕ m)
+
+right-id-law-mulℕ :
+  Π[ m ⦂ ℕ ] (m * 1 ≡ m)
+right-id-law-mulℕ 0ℕ = refl 0ℕ
+right-id-law-mulℕ (succℕ m) = ap succℕ (right-id-law-mulℕ m)
+
+left-succℕ-law-mulℕ :
+  Π[ m , n ⦂ ℕ ] (succℕ m * n ≡ m * n + n)
+left-succℕ-law-mulℕ m n = refl (addℕ (mulℕ m n) n)
+
+right-succℕ-law-mulℕ :
+  Π[ m , n ⦂ ℕ ] (m * succℕ n ≡ m + m * n)
+right-succℕ-law-mulℕ 0ℕ n = refl 0ℕ
+right-succℕ-law-mulℕ (succℕ m) n
+  = ap (λ t → succℕ (t + n)) (right-succℕ-law-mulℕ m n)
+  ∙ ap succℕ (associative-addℕ m (m * n) n)
+  ∙ inv (left-successor-law-addℕ m ((m * n) + n))
+
+commutative-law-mulℕ :
+  Π[ m , n ⦂ ℕ ] (m * n ≡ n * m)
+commutative-law-mulℕ 0ℕ n = inv (right-unit-law-mulℕ n)
+commutative-law-mulℕ (succℕ m) n
+  = (commutative-addℕ (m * n) n)
+  ∙ ap (n +_) (commutative-law-mulℕ m n)
+  ∙ inv (right-succℕ-law-mulℕ n m)
+
+
 ```

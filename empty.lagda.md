@@ -30,6 +30,12 @@ ex-falso = indΦ
 is-empty : 𝓤 i → 𝓤 i
 is-empty A = A → Φ
 
+¬¬_ : 𝓤 i → 𝓤 i
+¬¬ A = ¬ ¬ A
+
+¬¬¬_ : 𝓤 i → 𝓤 i
+¬¬¬ A = ¬ ¬ ¬ A
+
 -- Proof of Negation
 _ : {P : 𝓤 i} {Q : 𝓤 i}
   → (P → Q) → (¬ Q → ¬ P)
