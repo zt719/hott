@@ -12,6 +12,8 @@ open import Agda.Builtin.Equality
 
 private variable i : Level
 
+open import Pi
+
 data Bool : 𝓤₀ where
   false : Bool
   true : Bool
@@ -19,7 +21,7 @@ data Bool : 𝓤₀ where
 ind-Bool : {P : Bool → 𝓤 i}
   → P false
   → P true
-  → (x : Bool) → P x
+  → Π[ x ∶ Bool ] P x
 ind-Bool pf pt false = pf
 ind-Bool pf pt true  = pt
 
@@ -35,9 +37,9 @@ comp-Bool-p₁ : {P : Bool → 𝓤 i}
   → ind-Bool {P = P} p₀ p₁ true ≐ p₁
 comp-Bool-p₁ = λ p₀ p₁ → equal
 
-neg-Bool : Bool → Bool
-neg-Bool false = true
-neg-Bool true = false
+neg-bool : Bool → Bool
+neg-bool false = true
+neg-bool true = false
 
 
 

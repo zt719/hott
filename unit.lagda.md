@@ -9,13 +9,15 @@ module Unit where
 open import Agda.Primitive using (Level; lzero; lsuc; _⊔_)
                            renaming (Set to 𝓤)
                            
-private variable i : Level
+open import Pi
 
 -- 𝟙-formation Rule
 data 𝟙 : 𝓤₀ where
   ＊ : 𝟙
 
-ind𝟙 : {P : 𝟙 → 𝓤 i}
-  → P ＊ → (x : 𝟙) → P x
+ind𝟙 : {𝓲 : Level} {P : 𝟙 → 𝓤 𝓲}
+  → P ＊
+  → Π[ x ∶ 𝟙 ] P x
 ind𝟙 p ＊ = p
+
 ```

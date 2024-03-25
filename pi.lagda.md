@@ -19,48 +19,48 @@ Dependent Function Type:
 ```agda
 Π : (A : 𝓤 i) (B : A → 𝓤 j) → 𝓤 (i ⊔ j)
 Π A B = (x : A) → B x
-syntax Π A (λ x → b) = Π[ x ⦂ A ] b
+syntax Π A (λ x → b) = Π[ x ∶ A ] b
 
 Π2 : (A : 𝓤 i) (B : A → A → 𝓤 j) → 𝓤 (i ⊔ j)
 Π2 A B = (x₁ x₂ : A) → B x₁ x₂
-syntax Π2 A (λ x₁ x₂ → b) = Π[ x₁ , x₂ ⦂ A ] b
+syntax Π2 A (λ x₁ x₂ → b) = Π[ x₁ x₂ ∶ A ] b
 
 Π3 : (A : 𝓤 i) (B : A → A → A → 𝓤 j) → 𝓤 (i ⊔ j)
 Π3 A B = (x₁ x₂ x₃ : A) → B x₁ x₂ x₃
-syntax Π3 A (λ x₁ x₂ x₃ → b) = Π[ x₁ , x₂ , x₃ ⦂ A ] b
+syntax Π3 A (λ x₁ x₂ x₃ → b) = Π[ x₁ x₂ x₃ ∶ A ] b
 
 Π4 : (A : 𝓤 i) (B : A → A → A → A → 𝓤 j) → 𝓤 (i ⊔ j)
 Π4 A B = (x₁ x₂ x₃ x₄ : A) → B x₁ x₂ x₃ x₄
-syntax Π4 A (λ x₁ x₂ x₃ x₄ → b) = Π[ x₁ , x₂ , x₃ , x₄ ⦂ A ] b
+syntax Π4 A (λ x₁ x₂ x₃ x₄ → b) = Π[ x₁ x₂ x₃ x₄ ∶ A ] b
 
 Π5 : (A : 𝓤 i) (B : A → A → A → A → A → 𝓤 j) → 𝓤 (i ⊔ j)
 Π5 A B = (x₁ x₂ x₃ x₄ x₅ : A) → B x₁ x₂ x₃ x₄ x₅
-syntax Π5 A (λ x₁ x₂ x₃ x₄ x₅ → b) = Π[ x₁ , x₂ , x₃ , x₄ , x₅ ⦂ A ] b
+syntax Π5 A (λ x₁ x₂ x₃ x₄ x₅ → b) = Π[ x₁ x₂ x₃ x₄ x₅ ∶ A ] b
 
 Π' : (A : 𝓤 i) (B : A → 𝓤 j) → 𝓤 (i ⊔ j)
 Π' A B = {x : A} → B x
-syntax Π' A (λ x → b) = Π'[ x ⦂ A ] b
+syntax Π' A (λ x → b) = Π'[ x ∶ A ] b
 
 Π2' : (A : 𝓤 i) (B : A → A → 𝓤 j) → 𝓤 (i ⊔ j)
 Π2' A B = {x₁ x₂ : A} → B x₁ x₂
-syntax Π2' A (λ x₁ x₂ → b) = Π'[ x₁ , x₂ ⦂ A ] b
+syntax Π2' A (λ x₁ x₂ → b) = Π'[ x₁ x₂ ∶ A ] b
 
 Π3' : (A : 𝓤 i) (B : A → A → A → 𝓤 j) → 𝓤 (i ⊔ j)
 Π3' A B = {x₁ x₂ x₃ : A} → B x₁ x₂ x₃
-syntax Π3' A (λ x₁ x₂ x₃ → b) = Π'[ x₁ , x₂ , x₃ ⦂ A ] b
+syntax Π3' A (λ x₁ x₂ x₃ → b) = Π'[ x₁ x₂ x₃ ∶ A ] b
 
 Π4' : (A : 𝓤 i) (B : A → A → A → A → 𝓤 j) → 𝓤 (i ⊔ j)
 Π4' A B = {x₁ x₂ x₃ x₄ : A} → B x₁ x₂ x₃ x₄
-syntax Π4' A (λ x₁ x₂ x₃ x₄ → b) = Π'[ x₁ , x₂ , x₃ , x₄ ⦂ A ] b
+syntax Π4' A (λ x₁ x₂ x₃ x₄ → b) = Π'[ x₁ x₂ x₃ x₄ ∶ A ] b
 
 Π5' : (A : 𝓤 i) (B : A → A → A → A → A → 𝓤 j) → 𝓤 (i ⊔ j)
 Π5' A B = {x₁ x₂ x₃ x₄ x₅ : A} → B x₁ x₂ x₃ x₄ x₅
-syntax Π5' A (λ x₁ x₂ x₃ x₄ x₅ → b) = Π'[ x₁ , x₂ , x₃ , x₄ , x₅ ⦂ A ] b
+syntax Π5' A (λ x₁ x₂ x₃ x₄ x₅ → b) = Π'[ x₁ x₂ x₃ x₄ x₅ ∶ A ] b
 
 -- Π-introduction rule
 λ-rule : {A : 𝓤 i} {B : A → 𝓤 j}
   → (b : (x : A) → B x)
-  → Π[ x ⦂ A ] B x
+  → Π[ x ∶ A ] B x
 λ-rule b = λ x → b x
 
 λ-eq : {A : 𝓤 i} {B : A → 𝓤 j}
@@ -71,13 +71,13 @@ syntax Π5' A (λ x₁ x₂ x₃ x₄ x₅ → b) = Π'[ x₁ , x₂ , x₃ , x�
 
 -- Π-elimination rule
 ev : {A : 𝓤 i} {B : A → 𝓤 j}
-  → (f : Π[ x ⦂ A ] B x)
+  → (f : Π[ x ∶ A ] B x)
   → (x : A)
   → B x
 ev f x = f x
 
 ev-eq : {A : 𝓤 i} {B : A → 𝓤 j}
-  → {f f′ : Π[ x ⦂ A ] B x}
+  → {f f′ : Π[ x ∶ A ] B x}
   → f ≐ f′
   → (x : A)
   → f x ≐ f′ x
@@ -91,7 +91,7 @@ ev-eq equal x = equal
 β-rule b x = equal
 
 η-rule : {A : 𝓤 i} {B : A → 𝓤 j}
-  → (f : Π[ x ⦂ A ] B x)
+  → (f : Π[ x ∶ A ] B x)
   → (λ x → f x) ≐ f
 η-rule f = equal
  
@@ -102,11 +102,11 @@ Ordinary Function Type:
 
 ```agda
 _⇒_ : 𝓤 i → 𝓤 j → 𝓤 (i ⊔ j)
-A ⇒ B = Π[ x ⦂ A ] B
+A ⇒ B = Π[ x ∶ A ] B
 infixr  0 _⇒_
 
 _ : {A : 𝓤 i} {B : 𝓤 j}
-  → (A ⇒ B) ≐ Π[ x ⦂ A ] B
+  → (A ⇒ B) ≐ Π[ x ∶ A ] B
 _ = equal
 
 λ-rule-⇒ : {A : 𝓤 i} {B : 𝓤 j}
@@ -131,12 +131,12 @@ ev-⇒ f x = f x
   → (λ x → f x) ≐ f
 η-rule-⇒ f = equal
 
-id : {A : 𝓤 i}
+id : (A : 𝓤 i)
   → A ⇒ A
-id = λ x → x
+id A x = x
 
 _ : {A : 𝓤 i}
-  → id ≐ (λ (x : A) → x)
+  → id A ≐ (λ x → x)
 _ = equal
 
 comp : {A : 𝓤 i} {B : 𝓤 j} {C : 𝓤 k}
@@ -150,12 +150,12 @@ infixr 9 _∘_
 
 ∘-left-unit : {A : 𝓤 i} {B : 𝓤 j}
   → (f : A ⇒ B)
-  → id ∘ f ≐ f
+  → id B ∘ f ≐ f
 ∘-left-unit f = equal
 
 ∘-right-unit : {A : 𝓤 i} {B : 𝓤 j}
   → (f : A ⇒ B)
-  → f ∘ id ≐ f
+  → f ∘ id A ≐ f
 ∘-right-unit f = equal
 
 const : {A : 𝓤 i} {B : 𝓤 j}
@@ -176,10 +176,7 @@ _ : {A : 𝓤 i} {B : 𝓤 j} {C : 𝓤 k}
 _ = λ g y → equal
 
 σ : {A : 𝓤 i} {B : 𝓤 j} {C : A → B → 𝓤 k}
-  → Π[ x ⦂ A ] Π[ y ⦂ B ] C x y
-  → Π[ y ⦂ B ] Π[ x ⦂ A ] C x y
+  → Π[ x ∶ A ] Π[ y ∶ B ] C x y
+  → Π[ y ∶ B ] Π[ x ∶ A ] C x y
 σ = λ f x y → f y x
 
-_ : {A : 𝓤 i} {B : 𝓤 j} {C : A → B → 𝓤 k}
-  → σ {A = A} {B = B} {C = C} ∘ σ ≐ id
-_ = equal

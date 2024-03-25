@@ -24,7 +24,7 @@ data _∔_ (A : 𝓤 i) (B : 𝓤 j) : 𝓤 (i ⊔ j) where
 infixr 2 _∔_
 
 ind∔ : {A : 𝓤 i} {B : 𝓤 j} {P : A ∔ B → 𝓤 k}
-  → Π[ x ⦂ A ] (P (inl x)) ⇒ Π[ y ⦂ B ] (P (inr y)) ⇒ Π[ z ⦂ A ∔ B ] (P z)
+  → Π[ x ∶ A ] (P (inl x)) ⇒ Π[ y ∶ B ] (P (inr y)) ⇒ Π[ z ∶ A ∔ B ] (P z)
 ind∔ f g (inl x) = f x
 ind∔ f g (inr y) = g y
 
