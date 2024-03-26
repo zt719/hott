@@ -1,21 +1,14 @@
-```agda
-
-module Decidability where
+module 08-Decidability where
 
 open import Agda.Primitive
   using (Level; lzero; lsuc; _⊔_)
   renaming (Set to 𝓤)
-open import Agda.Builtin.Equality
-  renaming (_≡_ to _≐_; refl to equal)
 
-open import Pi
-open import Sigma
-open import Naturals
-open import Empty
-open import Unit
-open import Coproducts
-open import Identity
-open import Universes
+open import 02-Dependent-Function-Types
+open import 03-Natural-Numbers
+open import 04-Inductive-Types
+open import 05-Identity-Types
+open import 06-Universes
 
 is-decidable : {i : Level}
   → Π[ A ∶ 𝓤 i ] 𝓤 i
@@ -25,7 +18,7 @@ is-decidable A = A ∔ ¬ A
 𝟙-is-decidable = inl ＊
 
 Φ-is-decidable : is-decidable Φ
-Φ-is-decidable = inr id
+Φ-is-decidable = inr (id Φ)
 
 ∔-is-decidable : {i j : Level} {A : 𝓤 i} {B : 𝓤 j}
   → Π[ x ∶ is-decidable A ] Π[ y ∶ is-decidable B ] is-decidable (A ∔ B)
@@ -51,12 +44,11 @@ is-decidable A = A ∔ ¬ A
 Eqℕ-is-decidable :
   Π[ m n ∶ ℕ ] is-decidable (Eqℕ m n)
 Eqℕ-is-decidable 0ℕ 0ℕ = inl ＊
-Eqℕ-is-decidable 0ℕ (succℕ n) = inr id
-Eqℕ-is-decidable (succℕ m) 0ℕ = inr id
+Eqℕ-is-decidable 0ℕ (succℕ n) = inr (id Φ)
+Eqℕ-is-decidable (succℕ m) 0ℕ = inr (id Φ)
 Eqℕ-is-decidable (succℕ m) (succℕ n) = Eqℕ-is-decidable m n
 
 has-decidable-eq : {i : Level}
   → Π[ A ∶ 𝓤 i ] 𝓤 i
 has-decidable-eq A = Π[ x y ∶ A ] is-decidable (x ≡ y)
 
-```

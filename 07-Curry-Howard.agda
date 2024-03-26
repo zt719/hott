@@ -1,20 +1,14 @@
-```agda
-module Curry-Howard where
+module 07-Curry-Howard where
 
 open import Agda.Primitive
   using (Level; lzero; lsuc; _⊔_)
   renaming (Set to 𝓤)
-open import Agda.Builtin.Equality
-  renaming (_≡_ to _≐_; refl to equal)
 
-open import Pi
-open import Sigma
-open import Naturals
-open import Empty
-open import Coproducts
-open import Unit
-open import Identity
-open import Universes
+open import 02-Dependent-Function-Types
+open import 03-Natural-Numbers
+open import 04-Inductive-Types
+open import 05-Identity-Types
+open import 06-Universes
 
 postulate
   left-distributive-mulℕ : Π[ m n k ∶ ℕ ] (m * (n + k) ≡ m * n + m * k)
@@ -184,4 +178,3 @@ succ (succℕ k) (i x) = skip-zero k x
 [ succℕ x ] k = {!!}
 -}
 
-```

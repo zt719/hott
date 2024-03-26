@@ -1,23 +1,15 @@
-```agda
-
-module Equivalences where
+module 09-Equivalences where
 
 open import Agda.Primitive
   using (Level; lzero; lsuc; _⊔_)
   renaming (Set to 𝓤)
-open import Agda.Builtin.Equality
-  renaming (_≡_ to _≐_; refl to equal)
 
-open import Pi
-open import Sigma
-open import Naturals
-open import Boolean
-open import Empty
-open import Coproducts
-open import Unit
-open import Identity
-open import Universes
-open import Curry-Howard
+open import 02-Dependent-Function-Types
+open import 03-Natural-Numbers
+open import 04-Inductive-Types
+open import 05-Identity-Types
+open import 06-Universes
+open import 07-Curry-Howard
 
 private variable 𝓲 𝓳 𝓴 : Level
 
@@ -146,5 +138,3 @@ EqΣ {B = B} s t = Σ[ α ∶ pr₁ s ≡ pr₁ t ] (tr B α (pr₂ s) ≡ pr₂
 reflexive-EqΣ : {A : 𝓤 𝓲} {B : A → 𝓤 𝓳}
   → Π[ s ∶ Σ[ x ∶ A ] B x ] EqΣ s s
 reflexive-EqΣ s = refl (pr₁ s) , refl (pr₂ s)
-
-```

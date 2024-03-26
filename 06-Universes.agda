@@ -1,20 +1,13 @@
-```agda
-
-module Universes where
+module 06-Universes where
 
 open import Agda.Primitive
   using (Level; lzero; lsuc; _⊔_)
   renaming (Set to 𝓤)
-open import Agda.Builtin.Equality
-  renaming (_≡_ to _≐_; refl to equal)
 
-open import Pi
-open import Sigma
-open import Naturals
-open import Empty
-open import Unit
-open import Coproducts
-open import Identity
+open import 02-Dependent-Function-Types
+open import 03-Natural-Numbers
+open import 04-Inductive-Types
+open import 05-Identity-Types
 
 -- Observational Equality
 
@@ -114,6 +107,3 @@ ine (succℕ k) = ine k
 <-trans 0ℕ (succℕ y) (succℕ z) x<y y<z = ＊
 <-trans (succℕ x) (succℕ y) (succℕ z) x<y y<z = <-trans x y z x<y y<z
 
-
-
-```

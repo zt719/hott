@@ -1,126 +1,111 @@
-Identity Type - ≡
-
-```agda
-
 {-# OPTIONS --without-K --safe #-}
 
-module Identity where
+module 05-Identity-Types where
 
 open import Agda.Primitive
   using (Level; lzero; lsuc; _⊔_)
   renaming (Set to 𝓤)
 
-open import Pi
-open import Sigma
-open import Naturals
-open import Empty
+open import 02-Dependent-Function-Types
+open import 03-Natural-Numbers
+open import 04-Inductive-Types
 
-private variable i j k : Level
+private variable 𝓲 𝓳 𝓴 : Level
 
-data _≡_ {A : 𝓤 i} : A → A → 𝓤 i where
+data _≡_ {A : 𝓤 𝓲} : A → A → 𝓤 𝓲 where
   refl : Π[ a ∶ A ] (a ≡ a)
 infix  4 _≡_
 
-_≢_ : {A : 𝓤 i}
-  → A → A → 𝓤 i
+_≢_ : {A : 𝓤 𝓲}
+  → A → A → 𝓤 𝓲
 A ≢ B = ¬ (A ≡ B)
 infix  4 _≢_
 
-ind≡ : {A : 𝓤 i} {a : A} {P : Π[ x ∶ A ] Π[ p ∶ a ≡ x ] 𝓤 j}
+ind≡ : {A : 𝓤 𝓲} {a : A} {P : Π[ x ∶ A ] Π[ p ∶ a ≡ x ] 𝓤 𝓳}
   → P a (refl a) ⇒ Π[ x ∶ A ] Π[ p ∶ a ≡ x ] (P x p)
 ind≡ p a (refl a) = p
 
-concat : {A : 𝓤 i}
+concat : {A : 𝓤 𝓲}
   → Π'[ x y z ∶ A ] (x ≡ y ⇒ y ≡ z ⇒ x ≡ z)
 concat (refl x) (refl x) = refl x
-
-{-
-concat′ : {A : 𝓤 i} 
-  → Π'[ x , y , z ∶ A ] (x ≡ y ⇒ y ≡ z ⇒ x ≡ z)
-concat′ {x = x} {y = y} {z = z} p q = f x y p z q
-  where
-    f : {A : 𝓤 i }
-      → Π[ x , y ∶ A ] (x ≡ y ⇒ Π[ z ∶ A ] (y ≡ z ⇒ x ≡ z))
-    f x = ind≡ (λ z → id (x ≡ z))
--}
 
 _∙_ = concat
 infixl 7 _∙_
 
-inv : {A : 𝓤 i}
+inv : {A : 𝓤 𝓲}
   → Π'[ x y ∶ A ] (x ≡ y ⇒ y ≡ x)
 inv (refl x) = refl x
 
 _⁻¹ = inv
 infix 40 _⁻¹
 
-assoc : {A : 𝓤 i}
+assoc : {A : 𝓤 𝓲}
   → Π'[ x y z w ∶ A ] Π[ p ∶ x ≡ y ] Π[ q ∶ y ≡ z ] Π[ r ∶ z ≡ w ]
     ((p ∙ q) ∙ r ≡ p ∙ (q ∙ r))
 assoc (refl x) (refl x) (refl x) = refl (refl x)
 
-left-unit : {A : 𝓤 i}
+left-unit : {A : 𝓤 𝓲}
   → Π'[ x y ∶ A ] Π[ p ∶ x ≡ y ] (refl x ∙ p ≡ p)
 left-unit (refl x) = refl (refl x)
 
-right-unit : {A : 𝓤 i}
+right-unit : {A : 𝓤 𝓲}
   → Π'[ x y ∶ A ] Π[ p ∶ x ≡ y ] (p ∙ refl y ≡ p)
 right-unit (refl x) = refl (refl x)
 
-left-inv : {A : 𝓤 i}
+left-inv : {A : 𝓤 𝓲}
   → Π'[ x y ∶ A ] Π[ p ∶ x ≡ y ] (inv p ∙ p ≡ refl y)
 left-inv (refl x) = refl (refl x)
 
-right-inv : {A : 𝓤 i}
+right-inv : {A : 𝓤 𝓲}
   → Π'[ x y ∶ A ] Π[ p ∶ x ≡ y ] (p ∙ inv p ≡ refl x)
 right-inv (refl x) = refl (refl x)
 
--- 5.3 The action on identification of functions
-ap : {A : 𝓤 i} {B : 𝓤 j}
+-- 5.3 The action on 𝓲dentification of functions
+ap : {A : 𝓤 𝓲} {B : 𝓤 𝓳}
   → (f : A ⇒ B)
   → Π'[ x y ∶ A ] (x ≡ y ⇒ f x ≡ f y)
 ap f (refl x) = refl (f x)
 
-ap-id : {A : 𝓤 i}
+ap-id : {A : 𝓤 𝓲}
   → Π'[ x y ∶ A ] Π[ p ∶ x ≡ y ] (p ≡ ap (id A) p)
 ap-id (refl x) = refl (refl x)
 
-ap-comp : {A : 𝓤 i} {B : 𝓤 j} {C : 𝓤 k}
+ap-comp : {A : 𝓤 𝓲} {B : 𝓤 𝓳} {C : 𝓤 𝓴}
   → (f : A ⇒ B)
   → (g : B ⇒ C)
   → Π'[ x y ∶ A ] Π[ p ∶ x ≡ y ] (ap g (ap f p) ≡ ap (g ∘ f) p)
 ap-comp f g (refl x) = refl (refl (g (f x)))
 
-ap-refl : {A : 𝓤 i} {B : 𝓤 j}
+ap-refl : {A : 𝓤 𝓲} {B : 𝓤 𝓳}
   → (f : A ⇒ B)
   → Π[ x ∶ A ] (ap f (refl x) ≡ refl (f x))
 ap-refl f x = refl (refl (f x))
 
-ap-inv : {A : 𝓤 i} {B : 𝓤 j}
+ap-inv : {A : 𝓤 𝓲} {B : 𝓤 𝓳}
   → (f : A ⇒ B)
   → Π'[ x y ∶ A ] Π[ p ∶ x ≡ y ] (ap f (inv p) ≡ inv (ap f p))
 ap-inv f (refl x) = refl (ap f (refl x))
 
-ap-concat : {A : 𝓤 i} {B : 𝓤 j}
+ap-concat : {A : 𝓤 𝓲} {B : 𝓤 𝓳}
   → (f : A ⇒ B)
   → Π'[ x y z ∶ A ] Π[ p ∶ x ≡ y ] Π[ q ∶ y ≡ z ]
     (ap f (p ∙ q) ≡ ap f p ∙ ap f q)
 ap-concat f (refl x) (refl x) = refl (ap f (refl x))
 
 -- 5.4 Transport
-tr : {A : 𝓤 i}
-  → (B : A → 𝓤 j)
+tr : {A : 𝓤 𝓲}
+  → (B : A → 𝓤 𝓳)
   → Π'[ x y ∶ A ] (x ≡ y ⇒ B x ⇒ B y)
 tr B (refl x) = id (B x)
 
-apd : {A : 𝓤 i} {B : A → 𝓤 j}
+apd : {A : 𝓤 𝓲} {B : A → 𝓤 𝓳}
   → (f : Π[ a ∶ A ] B a)
   → Π'[ x y ∶ A ] Π[ p ∶ x ≡ y ] (tr B p (f x) ≡ f y)
 apd f (refl x) = refl (f x)
 
 --5.5 The uniqueness of refl
 
-prop551 : {A : 𝓤 i}
+prop551 : {A : 𝓤 𝓲}
   → (a : A)
   → (y : Σ[ x ∶ A ] (a ≡ x))
   → (a , refl a) ≡ y 
@@ -146,32 +131,32 @@ right-successor-law-addℕ :
 right-successor-law-addℕ m n = refl (succℕ (m + n))
 
 associative-addℕ :
-  Π[ m n k ∶ ℕ ] ((m + n) + k ≡ m + (n + k))
+  Π[ m n 𝓴 ∶ ℕ ] ((m + n) + 𝓴 ≡ m + (n + 𝓴))
 associative-addℕ m n 0ℕ = refl (addℕ m n)
-associative-addℕ m n (succℕ k) = ap succℕ (associative-addℕ m n k)
+associative-addℕ m n (succℕ 𝓴) = ap succℕ (associative-addℕ m n 𝓴)
 
 commutative-addℕ :
   Π[ m n ∶ ℕ ] (m + n ≡ n + m)
 commutative-addℕ 0ℕ n = left-unit-law-addℕ n
 commutative-addℕ (succℕ m) n = left-successor-law-addℕ m n ∙ ap succℕ (commutative-addℕ m n)
 
-distributive-inv-concat : {A : 𝓤 i}
+distributive-inv-concat : {A : 𝓤 𝓲}
   → Π'[ x y z ∶ A ] Π[ p ∶ x ≡ y ] Π[ q ∶ y ≡ z ]
     ((p ∙ q) ⁻¹ ≡ (q ⁻¹) ∙ (p ⁻¹))
 distributive-inv-concat (refl x) (refl x) = refl (refl x)
 
-inv-con : {A : 𝓤 i}
+inv-con : {A : 𝓤 𝓲}
   → Π'[ x y z ∶ A ] Π[ p ∶ x ≡ y ] Π[ q ∶ y ≡ z ] Π[ r ∶ x ≡ z ] ((p ∙ q ≡ r) ⇒ (q ≡ p ⁻¹ ∙ r))
 inv-con (refl x) (refl x) (refl x) (refl (refl x)) =
   refl (refl x)
 
-lift : {A : 𝓤 i}
-  → (B : A → 𝓤 j)
+lift : {A : 𝓤 𝓲}
+  → (B : A → 𝓤 𝓳)
   → Π'[ a x ∶ A ] Π[ p ∶ a ≡ x ] Π[ b ∶ B a ]
     ((a , b) ≡ (x , tr B p b))
 lift B (refl a) b = refl (a , b)
 
-Mac-Lane-pentagon : {A : 𝓤 i} →
+Mac-Lane-pentagon : {A : 𝓤 𝓲} →
   Π'[ a b c d e ∶ A ]
   Π[ p ∶ a ≡ b ] Π[ q ∶ b ≡ c ] Π[ r ∶ c ≡ d ] Π[ s ∶ d ≡ e ]
   let α₁ = (ap (λ t → t ∙ s) (assoc p q r))
@@ -220,4 +205,3 @@ commutative-law-mulℕ (succℕ m) n
   = (commutative-addℕ (m * n) n)
   ∙ ap (n +_) (commutative-law-mulℕ m n)
   ∙ inv (right-succℕ-law-mulℕ n m)
-```
