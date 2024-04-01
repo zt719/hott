@@ -107,18 +107,18 @@ _⇔_ : 𝓤 𝓲 → 𝓤 𝓳 → 𝓤 (𝓲 ⊔ 𝓳)
 A ⇔ B = (A ⇒ B) × (B ⇒ A)
 infixl 3 _⇔_
 
--- Boolean
-data Bool : 𝓤₀ where
-  false : Bool
-  true : Bool
+-- boolean
+data bool : 𝓤₀ where
+  false : bool
+  true : bool
 
-ind-Bool : {P : Bool → 𝓤 𝓲}
+ind-bool : {P : bool → 𝓤 𝓲}
   → P false
   → P true
-  → Π[ x ∶ Bool ] P x
-ind-Bool pf pt false = pf
-ind-Bool pf pt true  = pt
+  → Π[ x ∶ bool ] P x
+ind-bool pf pt false = pf
+ind-bool pf pt true  = pt
 
-neg-bool : Bool ⇒ Bool
+neg-bool : bool ⇒ bool
 neg-bool false = true
 neg-bool true = false

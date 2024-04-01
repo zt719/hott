@@ -25,7 +25,7 @@ is-decidable A = A ∔ ¬ A
 ∔-is-decidable (inl a) (inl b) = inl (inl a)
 ∔-is-decidable (inl a) (inr g) = inl (inl a)
 ∔-is-decidable (inr f) (inl b) = inl (inr b)
-∔-is-decidable (inr f) (inr g) = inr λ{ (inl x) → f x ; (inr x) → g x }
+∔-is-decidable (inr f) (inr g) = inr [ f , g ]
 
 ×-is-decidable : {i j : Level} {A : 𝓤 i} {B : 𝓤 j}
   → Π[ x ∶ is-decidable A ] Π[ y ∶ is-decidable B ] is-decidable (A × B)
