@@ -105,11 +105,11 @@ apd f (refl x) = refl (f x)
 
 --5.5 The uniqueness of refl
 
-prop551 : {A : 𝓤 𝓲}
+unique-refl : {A : 𝓤 𝓲}
   → (a : A)
   → (y : Σ[ x ∶ A ] (a ≡ x))
-  → (a , refl a) ≡ y 
-prop551 a (a , refl a) = refl (a , refl a)
+  → (a , refl a) ≡ y
+unique-refl a (a , refl a) = refl (a , refl a)
 
 --5.6 The laws of addition on ℕ
 left-unit-law-addℕ : 
