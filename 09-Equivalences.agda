@@ -75,13 +75,13 @@ left-whisk : {A : 𝓤 𝓲} {B : 𝓤 𝓳} {C : 𝓤 𝓴}
   → Π'[ f g ∶ A ⇒ B ] Π[ h ∶ B ⇒ C ] Π[ H ∶ f ~ g ] (h ∘ f ~ h ∘ g)
 left-whisk h H x = ap h (H x)
 
-_∙lw_ = left-whisk
+_∙l_ = left-whisk
 
 right-whisk : {A : 𝓤 𝓲} {B : 𝓤 𝓳} {C : 𝓤 𝓴}
   → Π'[ g h ∶ B ⇒ C ] Π[ H ∶ g ~ h ] Π[ f ∶ A ⇒ B ] (g ∘ f ~ h ∘ f)
 right-whisk H f x = H (f x)
 
-_∙rw_ = right-whisk
+_∙r_ = right-whisk
 
 -- 9.2 Bi-invertible maps
 
@@ -123,10 +123,10 @@ has-inverse⇒is-equiv (g , (H , K))
 is-equiv⇒has-inverse : {A : 𝓤 𝓲} {B : 𝓤 𝓳}
   → Π[ f ∶ A ⇒ B ] (is-equiv f ⇒ has-inverse f)
 is-equiv⇒has-inverse f ((g , G) , (h , H))
-  = g , (G , (K ∙rw f) ∙h H)
+  = g , (G , (K ∙r f) ∙h H)
   where
   K : g ~ h
-  K = (inv-htpy (H ∙rw g)) ∙h (h ∙lw G)
+  K = (inv-htpy (H ∙r g)) ∙h (h ∙l G)
 
 {-
 Φ∔B≃B : {B : 𝓤 𝓲}
@@ -238,8 +238,30 @@ constb-is-not-equiv false ((s , is-sec) , (r , is-retr))
 constb-is-not-equiv true  ((s , is-sec) , (r , is-retr))
   = t≢f (is-sec false)
 
-bool≄𝟙 : bool ≄ 𝟙
-bool≄𝟙 (x , x₁) = {!!}
+-- 9.3
 
+9-3a : {A : 𝓤 𝓲} {B : 𝓤 𝓳}
+  → Π[ f g ∶ A ⇒ B ] Π[ H ∶ f ~ g ](is-equiv f ⇔ is-equiv g)
+9-3a f g H = to , from
+  where
+  to : is-equiv f ⇒ is-equiv g
+  to ((s , is-sec) , (r , is-retr))
+    = (s , (inv-htpy (H ∙r s) ∙h is-sec))
+    , (r , ((r ∙l (inv-htpy H)) ∙h is-retr))
+  from : is-equiv g ⇒ is-equiv f
+  from ((s , is-sec) , (r , is-retr))
+    = (s , ((H ∙r s) ∙h is-sec))
+    , (r , ((r ∙l H) ∙h is-retr))
 
--- 9.2
+-- 9.4
+
+9-4a : {A : 𝓤 𝓲} {B : 𝓤 𝓳} {X : 𝓤 𝓴}
+  → Π[ f ∶ A ⇒ X ] Π[ g ∶ B ⇒ X ] Π[ h ∶ A ⇒ B ]
+    Π[ H ∶ f ~ g ∘ h ] Π[ sec-s ∶ sec h ] (g ~ f ∘ (pr₁ sec-s))
+9-4a f g h H (s , is-sec) = inv-htpy ((H ∙r s) ∙h (g ∙l is-sec))
+
+9-4b : {A : 𝓤 𝓲} {B : 𝓤 𝓳} {X : 𝓤 𝓴}
+  → Π[ f ∶ A ⇒ X ] Π[ g ∶ B ⇒ X ] Π[ h ∶ A ⇒ B ]
+    Π[ H ∶ f ~ g ∘ h ] Π[ retr-r ∶ retr g ] (h ~ (pr₁ retr-r) ∘ f)
+9-4b f g h H (r , is-retr) = inv-htpy ((r ∙l H) ∙h (is-retr ∙r h))
+
