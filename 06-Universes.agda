@@ -3,11 +3,7 @@ module 06-Universes where
 open import Agda.Primitive
   using (Level; lzero; lsuc; _⊔_)
   renaming (Set to 𝓤)
-
-open import 02-Dependent-Function-Types
-open import 03-Natural-Numbers
-open import 04-Inductive-Types
-open import 05-Identity-Types
+open import 05-Identity-Types public
 
 -- Observational Equality
 

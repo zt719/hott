@@ -1,14 +1,9 @@
-{-# OPTIONS --without-K --safe #-}
-
 module 05-Identity-Types where
 
 open import Agda.Primitive
   using (Level; lzero; lsuc; _⊔_)
   renaming (Set to 𝓤)
-
-open import 02-Dependent-Function-Types
-open import 03-Natural-Numbers
-open import 04-Inductive-Types
+open import 04-Inductive-Types public
 
 private variable 𝓲 𝓳 𝓴 : Level
 

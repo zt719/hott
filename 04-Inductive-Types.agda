@@ -1,11 +1,9 @@
-{-# OPTIONS --without-K --safe #-}
-
 module 04-Inductive-Types where
 
-open import Agda.Primitive using (Level; lzero; lsuc; _⊔_)
-                           renaming (Set to 𝓤)
-                           
-open import 02-Dependent-Function-Types
+open import Agda.Primitive
+  using (Level; lzero; lsuc; _⊔_)
+  renaming (Set to 𝓤)                           
+open import 03-Natural-Numbers public
 
 private variable 𝓲 𝓳 𝓴 𝓱 : Level
 

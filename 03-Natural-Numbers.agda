@@ -1,12 +1,9 @@
-{-# OPTIONS --without-K --safe #-}
-
 module 03-Natural-Numbers where
 
 open import Agda.Primitive
   using (Level; lzero; lsuc; _⊔_)
   renaming (Set to 𝓤)
-
-open import 02-Dependent-Function-Types
+open import 02-Dependent-Function-Types public
 
 private variable 𝓲 : Level
 
@@ -24,6 +21,8 @@ indℕ : {P : ℕ → 𝓤 𝓲}
   ⇒ Π[ n ∶ ℕ ] (P n)
 indℕ p₀ pₛ 0ℕ = p₀
 indℕ p₀ pₛ (succℕ n) = pₛ n (indℕ p₀ pₛ n)
+
+ℕind = indℕ
 
 -- Addition on ℕ
 add-zeroℕ : ℕ ⇒ ℕ

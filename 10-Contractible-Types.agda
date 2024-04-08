@@ -3,14 +3,7 @@ module 10-Contractible-Types where
 open import Agda.Primitive
   using (Level; lzero; lsuc; _⊔_)
   renaming (Set to 𝓤)
-
-open import 02-Dependent-Function-Types
-open import 03-Natural-Numbers
-open import 04-Inductive-Types
-open import 05-Identity-Types
-open import 06-Universes
-open import 07-Curry-Howard
-open import 09-Equivalences
+open import 09-Equivalences public
 
 private variable 𝓲 𝓳 𝓴 : Level
 
@@ -134,9 +127,31 @@ Eq-fib⇒≡-is-equiv f xp xp′
   is-retr f (x , refl .(f x)) (.x , refl .(f x)) (refl (.x , refl .(f x)))
     = refl (refl (x , refl (f x)))
 
+-- 10.4 Equivalences are contractible maps
+
 is-contr-map : {A : 𝓤 𝓲} {B : 𝓤 𝓳}
   → Π[ f ∶ A ⇒ B ] 𝓤 (𝓲 ⊔ 𝓳)
 is-contr-map {B = B} f = Π[ b ∶ B ] is-contr (fib f b)
-  
--- is-contr-map-is-equiv : {A : 𝓤 𝓲} {B : 𝓤 𝓳}
---   → Π[ f ∶ A ⇒ B ] (is-contr-map
+
+{-
+is-contr-map-is-equiv : {A : 𝓤 𝓲} {B : 𝓤 𝓳}
+  → Π[ f ∶ A ⇒ B ] (is-contr-map f ⇒ is-equiv f)
+is-contr-map-is-equiv {A = A} {B = B} f is-contr-map-f
+  = (g , G)
+  , (g , {!!})
+  where
+  df : Π[ y ∶ B ] fib f y
+  df y = center (is-contr-map-f y)
+
+  g : B ⇒ A
+  g y = pr₁ (df y)
+
+  G : Π[ y ∶ B ] (f (g y) ≡ y)
+  G y = pr₂ (df y)
+
+  p : Π[ x ∶ A ] (f (g (f x)) ≡ f x)
+  p x = G (f x)
+
+  q : Π[ x ∶ A ] ((g (f x) , p x) ≡ (x , refl (f x)))
+  q x = {!is-contr-map-f (f x)!}
+-}
