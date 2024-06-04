@@ -1,202 +1,263 @@
 module 05-Identity-Types where
 
-open import Agda.Primitive
-  using (Level; lzero; lsuc; _⊔_)
-  renaming (Set to 𝓤)
 open import 04-Inductive-Types public
 
-private variable 𝓲 𝓳 𝓴 : Level
+-- 5.1 The inductive definition of identity types
 
-data _≡_ {A : 𝓤 𝓲} : A → A → 𝓤 𝓲 where
-  refl : Π[ a ∶ A ] (a ≡ a)
+data _≡_ {A : UU i} : A → A → UU i where
+  refl : (a : A) → a ≡ a
 infix  4 _≡_
 
-_≢_ : {A : 𝓤 𝓲}
-  → A → A → 𝓤 𝓲
+_≢_ : {A : UU i}
+  → A → A → UU i
 A ≢ B = ¬ (A ≡ B)
 infix  4 _≢_
 
-ind≡ : {A : 𝓤 𝓲} {a : A} {P : Π[ x ∶ A ] Π[ p ∶ a ≡ x ] 𝓤 𝓳}
-  → P a (refl a) ⇒ Π[ x ∶ A ] Π[ p ∶ a ≡ x ] (P x p)
+ind≡ : {A : UU i} {a : A} {P : (x : A) (p : a ≡ x) → UU j}
+  → P a (refl a)
+  → (x : A) (p : a ≡ x) → P x p
 ind≡ p a (refl a) = p
 
-concat : {A : 𝓤 𝓲}
-  → Π'[ x y z ∶ A ] (x ≡ y ⇒ y ≡ z ⇒ x ≡ z)
+-- 5.2 The groupoidal structures of types
+
+concat : {A : UU i} {x y z : A}
+  → x ≡ y → y ≡ z → x ≡ z
 concat (refl x) (refl x) = refl x
 
 _∙_ = concat
 infixl 7 _∙_
 
-inv : {A : 𝓤 𝓲}
-  → Π'[ x y ∶ A ] (x ≡ y ⇒ y ≡ x)
+inv : {A : UU i} {x y : A}
+  → x ≡ y → y ≡ x
 inv (refl x) = refl x
 
-_⁻¹ = inv
-infix 40 _⁻¹
-
-assoc : {A : 𝓤 𝓲}
-  → Π'[ x y z w ∶ A ] Π[ p ∶ x ≡ y ] Π[ q ∶ y ≡ z ] Π[ r ∶ z ≡ w ]
-    ((p ∙ q) ∙ r ≡ p ∙ (q ∙ r))
+assoc : {A : UU i} {x y z w : A}
+  → (p : x ≡ y) (q : y ≡ z) (r : z ≡ w)
+  → (p ∙ q) ∙ r ≡ p ∙ (q ∙ r)
 assoc (refl x) (refl x) (refl x) = refl (refl x)
 
-left-unit : {A : 𝓤 𝓲}
-  → Π'[ x y ∶ A ] Π[ p ∶ x ≡ y ] (refl x ∙ p ≡ p)
-left-unit (refl x) = refl (refl x)
+leftˡ : {A : UU i} {x y : A}
+  → (p : x ≡ y)
+  → refl x ∙ p ≡ p
+leftˡ (refl x) = refl (refl x)
 
-right-unit : {A : 𝓤 𝓲}
-  → Π'[ x y ∶ A ] Π[ p ∶ x ≡ y ] (p ∙ refl y ≡ p)
-right-unit (refl x) = refl (refl x)
+rightʳ : {A : UU i} {x y : A}
+  → (p : x ≡ y)
+  → p ∙ refl y ≡ p
+rightʳ (refl x) = refl (refl x)
 
-left-inv : {A : 𝓤 𝓲}
-  → Π'[ x y ∶ A ] Π[ p ∶ x ≡ y ] (inv p ∙ p ≡ refl y)
-left-inv (refl x) = refl (refl x)
+invˡ : {A : UU i} {x y : A}
+  → (p : x ≡ y)
+  → inv p ∙ p ≡ refl y
+invˡ (refl x) = refl (refl x)
 
-right-inv : {A : 𝓤 𝓲}
-  → Π'[ x y ∶ A ] Π[ p ∶ x ≡ y ] (p ∙ inv p ≡ refl x)
-right-inv (refl x) = refl (refl x)
+invʳ : {A : UU i} {x y : A}
+  → (p : x ≡ y)
+  → p ∙ inv p ≡ refl x
+invʳ (refl x) = refl (refl x)
 
--- 5.3 The action on 𝓲dentification of functions
-ap : {A : 𝓤 𝓲} {B : 𝓤 𝓳}
-  → (f : A ⇒ B)
-  → Π'[ x y ∶ A ] (x ≡ y ⇒ f x ≡ f y)
+-- 5.3 The action on identification of functions
+
+ap : {A : UU i} {B : UU j}
+  → (f : A → B) {x y : A}
+  → x ≡ y → f x ≡ f y
 ap f (refl x) = refl (f x)
 
-ap-id : {A : 𝓤 𝓲}
-  → Π'[ x y ∶ A ] Π[ p ∶ x ≡ y ] (p ≡ ap (id A) p)
+ap-id : {A : UU i} {x y : A}
+  → (p : x ≡ y)
+  → p ≡ ap (id A) p
 ap-id (refl x) = refl (refl x)
 
-ap-comp : {A : 𝓤 𝓲} {B : 𝓤 𝓳} {C : 𝓤 𝓴}
-  → (f : A ⇒ B)
-  → (g : B ⇒ C)
-  → Π'[ x y ∶ A ] Π[ p ∶ x ≡ y ] (ap g (ap f p) ≡ ap (g ∘ f) p)
+ap-comp : {A : UU i} {B : UU j} {C : UU k} {x y : A}
+  → (f : A → B)
+  → (g : B → C)
+  → (p : x ≡ y)
+  → ap g (ap f p) ≡ ap (g ∘ f) p
 ap-comp f g (refl x) = refl (refl (g (f x)))
 
-ap-refl : {A : 𝓤 𝓲} {B : 𝓤 𝓳}
-  → (f : A ⇒ B)
-  → Π[ x ∶ A ] (ap f (refl x) ≡ refl (f x))
+ap-refl : {A : UU i} {B : UU j}
+  → (f : A → B)
+  → (x : A)
+  → ap f (refl x) ≡ refl (f x)
 ap-refl f x = refl (refl (f x))
 
-ap-inv : {A : 𝓤 𝓲} {B : 𝓤 𝓳}
-  → (f : A ⇒ B)
-  → Π'[ x y ∶ A ] Π[ p ∶ x ≡ y ] (ap f (inv p) ≡ inv (ap f p))
+ap-inv : {A : UU i} {B : UU j} {x y : A}
+  → (f : A → B)
+  → (p : x ≡ y)
+  → ap f (inv p) ≡ inv (ap f p)
 ap-inv f (refl x) = refl (ap f (refl x))
 
-ap-concat : {A : 𝓤 𝓲} {B : 𝓤 𝓳}
-  → (f : A ⇒ B)
-  → Π'[ x y z ∶ A ] Π[ p ∶ x ≡ y ] Π[ q ∶ y ≡ z ]
-    (ap f (p ∙ q) ≡ ap f p ∙ ap f q)
+ap-concat : {A : UU i} {B : UU j} {x y z : A}
+  → (f : A → B)
+  → (p : x ≡ y) (q : y ≡ z)
+  → ap f (p ∙ q) ≡ ap f p ∙ ap f q
 ap-concat f (refl x) (refl x) = refl (ap f (refl x))
 
 -- 5.4 Transport
-tr : {A : 𝓤 𝓲}
-  → (B : A → 𝓤 𝓳)
-  → Π'[ x y ∶ A ] (x ≡ y ⇒ B x ⇒ B y)
+
+tr : {A : UU i} {x y : A}
+  → (B : A → UU j)
+  → x ≡ y → B x → B y
 tr B (refl x) = id (B x)
 
-apd : {A : 𝓤 𝓲} {B : A → 𝓤 𝓳}
-  → (f : Π[ a ∶ A ] B a)
-  → Π'[ x y ∶ A ] Π[ p ∶ x ≡ y ] (tr B p (f x) ≡ f y)
+apd : {A : UU i} {B : A → UU j} {x y : A}
+  → (f : (a : A) → B a)
+  → (p : x ≡ y)
+  → tr B p (f x) ≡ f y
 apd f (refl x) = refl (f x)
 
 --5.5 The uniqueness of refl
 
-unique-refl : {A : 𝓤 𝓲}
+unique-refl : {A : UU i}
   → (a : A)
-  → (y : Σ[ x ∶ A ] (a ≡ x))
+  → (y : Σ x ∶ A , (a ≡ x))
   → (a , refl a) ≡ y
 unique-refl a (a , refl a) = refl (a , refl a)
 
 --5.6 The laws of addition on ℕ
-left-unit-law-addℕ : 
-  Π[ n ∶ ℕ ] (0 + n ≡ n)
-left-unit-law-addℕ 0ℕ = refl 0ℕ
-left-unit-law-addℕ (succℕ n) = ap succℕ (left-unit-law-addℕ n)
 
-right-unit-law-addℕ :
-  Π[ n ∶ ℕ ] (n + 0 ≡ n)
-right-unit-law-addℕ n = refl n
++-unitˡ : (n : ℕ)
+  → 0 + n ≡ n
++-unitˡ 0ℕ = refl 0ℕ
++-unitˡ (succℕ n) = ap succℕ (+-unitˡ n)
 
-left-successor-law-addℕ :
-  Π[ m n ∶ ℕ ] (succℕ m + n ≡ succℕ (m + n))
-left-successor-law-addℕ m 0ℕ = refl (succℕ m)
-left-successor-law-addℕ m (succℕ n) = ap succℕ (left-successor-law-addℕ m n)
++-unitʳ : (n : ℕ)
+  → n + 0 ≡ n
++-unitʳ n = refl n
 
-right-successor-law-addℕ :
-  Π[ m n ∶ ℕ ] (m + succℕ n ≡ succℕ (m + n))
-right-successor-law-addℕ m n = refl (succℕ (m + n))
+succˡ : (m n : ℕ)
+  → succℕ m + n ≡ succℕ (m + n)
+succˡ m 0ℕ = refl (succℕ m)
+succˡ m (succℕ n) = ap succℕ (succˡ m n)
 
-associative-addℕ :
-  Π[ m n 𝓴 ∶ ℕ ] ((m + n) + 𝓴 ≡ m + (n + 𝓴))
-associative-addℕ m n 0ℕ = refl (addℕ m n)
-associative-addℕ m n (succℕ 𝓴) = ap succℕ (associative-addℕ m n 𝓴)
+succʳ : (m n : ℕ)
+  → m + succℕ n ≡ succℕ (m + n)
+succʳ m n = refl (succℕ (m + n))
 
-commutative-addℕ :
-  Π[ m n ∶ ℕ ] (m + n ≡ n + m)
-commutative-addℕ 0ℕ n = left-unit-law-addℕ n
-commutative-addℕ (succℕ m) n = left-successor-law-addℕ m n ∙ ap succℕ (commutative-addℕ m n)
++-assoc : (m n k : ℕ)
+  → (m + n) + k ≡ m + (n + k)
++-assoc m n 0ℕ = refl (m + n)
++-assoc m n (succℕ k) = ap succℕ (+-assoc m n k)
 
-distributive-inv-concat : {A : 𝓤 𝓲}
-  → Π'[ x y z ∶ A ] Π[ p ∶ x ≡ y ] Π[ q ∶ y ≡ z ]
-    ((p ∙ q) ⁻¹ ≡ (q ⁻¹) ∙ (p ⁻¹))
++-com : (m n : ℕ)
+  → m + n ≡ n + m
++-com 0ℕ n = +-unitˡ n
++-com (succℕ m) n = succˡ m n ∙ ap succℕ (+-com m n)
+
+-- Exercises
+
+distributive-inv-concat : {A : UU i} {x y z : A}
+  → (p : x ≡ y) (q : y ≡ z)
+  → inv (p ∙ q) ≡ inv q ∙ inv p
 distributive-inv-concat (refl x) (refl x) = refl (refl x)
 
-inv-con : {A : 𝓤 𝓲}
-  → Π'[ x y z ∶ A ] Π[ p ∶ x ≡ y ] Π[ q ∶ y ≡ z ] Π[ r ∶ x ≡ z ] ((p ∙ q ≡ r) ⇒ (q ≡ p ⁻¹ ∙ r))
+inv-con : {A : UU i} {x y z : A}
+  → (p : x ≡ y) (q : y ≡ z) (r : x ≡ z)
+  → (p ∙ q ≡ r) → (q ≡ inv p ∙ r)
 inv-con (refl x) (refl x) (refl x) (refl (refl x)) =
   refl (refl x)
 
-lift : {A : 𝓤 𝓲}
-  → (B : A → 𝓤 𝓳)
-  → Π'[ a x ∶ A ] Π[ p ∶ a ≡ x ] Π[ b ∶ B a ]
-    ((a , b) ≡ (x , tr B p b))
+lift : {A : UU i} {a x : A}
+  → (B : A → UU j)
+  → (p : a ≡ x) (b : B a)
+  → (a , b) ≡ (x , tr B p b)
 lift B (refl a) b = refl (a , b)
 
-Mac-Lane-pentagon : {A : 𝓤 𝓲} →
-  Π'[ a b c d e ∶ A ]
-  Π[ p ∶ a ≡ b ] Π[ q ∶ b ≡ c ] Π[ r ∶ c ≡ d ] Π[ s ∶ d ≡ e ]
-  let α₁ = (ap (λ t → t ∙ s) (assoc p q r))
-      α₂ = (assoc p (q ∙ r) s)
-      α₃ = (ap (λ t → p ∙ t) (assoc q r s))
-      α₄ = (assoc (p ∙ q) r s)
-      α₅ = (assoc p q (r ∙ s))
-  in ((α₁ ∙ α₂) ∙ α₃) ≡ (α₄ ∙ α₅)
+Mac-Lane-pentagon : {A : UU i} {a b c d e : A}
+  → (p : a ≡ b) (q : b ≡ c) (r : c ≡ d) (s : d ≡ e)
+  → let α₁ = (ap (λ t → t ∙ s) (assoc p q r))
+        α₂ = (assoc p (q ∙ r) s)
+        α₃ = (ap (λ t → p ∙ t) (assoc q r s))
+        α₄ = (assoc (p ∙ q) r s)
+        α₅ = (assoc p q (r ∙ s))
+    in ((α₁ ∙ α₂) ∙ α₃) ≡ (α₄ ∙ α₅)
 Mac-Lane-pentagon (refl x) (refl x) (refl x) (refl x) = refl (refl (refl x))
 
-left-unit-law-mulℕ :
-  Π[ m ∶ ℕ ] (0ℕ * m ≡ 0ℕ)
-left-unit-law-mulℕ m = refl 0ℕ
+*-unitˡ : (m : ℕ)
+  → 0 * m ≡ 0
+*-unitˡ m = refl 0ℕ
 
-right-unit-law-mulℕ :
-  Π[ m ∶ ℕ ] (m * 0ℕ ≡ 0ℕ)
-right-unit-law-mulℕ 0ℕ = refl 0ℕ
-right-unit-law-mulℕ (succℕ m) = right-unit-law-mulℕ m
+*-unitʳ : (m : ℕ)
+  → m * 0 ≡ 0
+*-unitʳ 0ℕ = refl 0ℕ
+*-unitʳ (succℕ m) = *-unitʳ m
 
-left-id-law-mulℕ :
-  Π[ m ∶ ℕ ] (1 * m ≡ m)
-left-id-law-mulℕ 0ℕ = refl 0ℕ
-left-id-law-mulℕ (succℕ m) = ap succℕ (left-id-law-mulℕ m)
+*-idˡ : (m : ℕ)
+  → 1 * m ≡ m
+*-idˡ 0ℕ = refl 0ℕ
+*-idˡ (succℕ m) = ap succℕ (*-idˡ m)
 
-right-id-law-mulℕ :
-  Π[ m ∶ ℕ ] (m * 1 ≡ m)
-right-id-law-mulℕ 0ℕ = refl 0ℕ
-right-id-law-mulℕ (succℕ m) = ap succℕ (right-id-law-mulℕ m)
+*-idʳ : (m : ℕ)
+  → m * 1 ≡ m
+*-idʳ 0ℕ = refl 0ℕ
+*-idʳ (succℕ m) = ap succℕ (*-idʳ m)
 
-left-succℕ-law-mulℕ :
-  Π[ m n ∶ ℕ ] (succℕ m * n ≡ m * n + n)
-left-succℕ-law-mulℕ m n = refl (addℕ (mulℕ m n) n)
+*-succˡ : (m n : ℕ)
+  → succℕ m * n ≡ m * n + n
+*-succˡ m n = refl (m * n + n)
 
-right-succℕ-law-mulℕ :
-  Π[ m n ∶ ℕ ] (m * succℕ n ≡ m + m * n)
-right-succℕ-law-mulℕ 0ℕ n = refl 0ℕ
-right-succℕ-law-mulℕ (succℕ m) n
-  = ap (λ t → succℕ (t + n)) (right-succℕ-law-mulℕ m n)
-  ∙ ap succℕ (associative-addℕ m (m * n) n)
-  ∙ inv (left-successor-law-addℕ m ((m * n) + n))
+*-succʳ : (m n : ℕ)
+  → m * succℕ n ≡ m + m * n
+*-succʳ 0ℕ n = refl 0ℕ
+*-succʳ (succℕ m) n
+  = ap (λ t → succℕ (t + n)) (*-succʳ m n)
+  ∙ ap succℕ (+-assoc m (m * n) n)
+  ∙ inv (succˡ m ((m * n) + n))
 
-commutative-law-mulℕ :
-  Π[ m n ∶ ℕ ] (m * n ≡ n * m)
-commutative-law-mulℕ 0ℕ n = inv (right-unit-law-mulℕ n)
-commutative-law-mulℕ (succℕ m) n
-  = (commutative-addℕ (m * n) n)
-  ∙ ap (n +_) (commutative-law-mulℕ m n)
-  ∙ inv (right-succℕ-law-mulℕ n m)
+*-com : (m n : ℕ)
+  → m * n ≡ n * m
+*-com 0ℕ n = inv (*-unitʳ n)
+*-com (succℕ m) n
+  = (+-com (m * n) n)
+  ∙ ap (n +_) (*-com m n)
+  ∙ inv (*-succʳ n m)
+
+*-+-distrˡ : (m n k : ℕ)
+  → m * (n + k) ≡ m * n + m * k
+*-+-distrˡ m n 0ℕ = ap (m * n +_) (inv (*-unitʳ m))
+*-+-distrˡ m n (succℕ k)
+  = *-succʳ m (n + k)
+  ∙ ap (m +_) (*-+-distrˡ m n k)
+  ∙ inv (+-assoc m (m * n) (m * k))
+  ∙ ap (_+ m * k) (+-com m (m * n))
+  ∙ +-assoc (m * n) m (m * k)
+  ∙ ap (m * n +_) (inv (*-succʳ m k))
+
+*-+-distrʳ : (m n k : ℕ)
+  → (m + n) * k ≡ m * k + n * k
+*-+-distrʳ m n 0ℕ =
+  *-unitʳ (m + n)
+  ∙ inv (ap (m * 0 +_) (*-unitʳ n) ∙ *-unitʳ m)
+*-+-distrʳ m n (succℕ k)
+  = *-succʳ (m + n) k
+  ∙ ap (m + n +_) (*-+-distrʳ m n k)
+  ∙ +-assoc m n (m * k + n * k)
+  ∙ ap (m +_)
+    ( inv (+-assoc n (m * k) (n * k))
+    ∙ ap (_+ n * k) (+-com n (m * k))
+    ∙ +-assoc (m * k) n (n * k)
+    )
+  ∙ inv
+    ( (ap (_+ n * succℕ k) (*-succʳ m k))
+    ∙ (ap (m + m * k +_) (*-succʳ n k))
+    ∙ (+-assoc m (m * k) (n + n * k ))
+    )
+    
+succpredℤ : (n : ℤ)
+  → succℤ (predℤ n) ≡ n
+succpredℤ (inl n) = refl (in-neg n)
+succpredℤ (inr (inl ＊)) = refl 0ℤ
+succpredℤ (inr (inr 0ℕ)) = refl 1ℤ
+succpredℤ (inr (inr (succℕ n))) = refl (in-pos (succℕ n))
+
+predsuccℤ : (n : ℤ)
+  → predℤ (succℤ n) ≡ n
+predsuccℤ (inl 0ℕ) = refl -1ℤ
+predsuccℤ (inl (succℕ n)) = refl (in-neg (succℕ n))
+predsuccℤ (inr (inl ＊)) = refl 0ℤ
+predsuccℤ (inr (inr n)) = refl (in-pos n)
+
+{-
++ℤ-unitˡ : (n : ℤ)
+  → addℤ 0ℤ n ≡ n
+-}
