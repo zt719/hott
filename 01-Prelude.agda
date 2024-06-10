@@ -4,4 +4,4 @@ open import Agda.Primitive public
   using (Level; lzero; lsuc; _⊔_)
   renaming (Set to UU)
 
-variable i j k l : Level
+variable l₁ l₂ l₃ l₄ l₅ l₆ : Level

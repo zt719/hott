@@ -11,7 +11,7 @@ three-divides-six : 3 ∣ 6
 three-divides-six = (2 , refl 6)
 
 one-dividesℕ : (x : ℕ) → 1 ∣ x
-one-dividesℕ x = (x , *-idˡ x)
+one-dividesℕ x = (x , idˡ-* x)
 
 -- Proposition 7.1.5
 
@@ -21,7 +21,7 @@ p7-1-5 : (x y d : ℕ)
 p7-1-5 x y d ((k , d*k≡x) , (l , d*l≡y)) = ((k + l) , α ∙ β ∙ γ)
   where
   α : d * (k + l) ≡ d * k + d * l
-  α = *-+-distrˡ d k l
+  α = *+-distrˡ d k l
   β : d * k + d * l ≡ x + d * l
   β = ap (_+ d * l) d*k≡x
   γ : x + d * l ≡ x + y
@@ -29,34 +29,40 @@ p7-1-5 x y d ((k , d*k≡x) , (l , d*l≡y)) = ((k + l) , α ∙ β ∙ γ)
 
 -- 7.2 The congruence relations on ℕ
 
-distℕ : ℕ → ℕ → ℕ
-distℕ 0ℕ 0ℕ = 0ℕ
-distℕ 0ℕ (succℕ y) = succℕ y
-distℕ (succℕ x) 0ℕ = succℕ x
-distℕ (succℕ x) (succℕ y) = distℕ x y
+reflexive : {A : UU l₁}
+  → (R : A → A → UU l₂) → UU (l₁ ⊔ l₂)
+reflexive R = (x : _) → R x x
 
-distℕ-refl : (x : ℕ) → 0ℕ ≡ distℕ x x
-distℕ-refl 0ℕ = refl 0ℕ
-distℕ-refl (succℕ x) = distℕ-refl x
+symmetric : {A : UU l₁}
+  → (R : A → A → UU l₂) → UU (l₁ ⊔ l₂)
+symmetric R = (x y : _) → R x y → R y x
 
-distℕ-sym : (x y : ℕ) → distℕ x y ≡ distℕ y x
-distℕ-sym 0ℕ 0ℕ = refl 0ℕ
-distℕ-sym 0ℕ (succℕ y) = refl (succℕ y)
-distℕ-sym (succℕ x) 0ℕ = refl (succℕ x)
-distℕ-sym (succℕ x) (succℕ y) = distℕ-sym x y
+transitive : {A : UU l₁}
+  → (R : A → A → UU l₂) → UU (l₁ ⊔ l₂)
+transitive R = (x y z : _) → R x y → R y z → R x z
 
-_≡_mod_ : ℕ → ℕ → ℕ → UU₀
+equivalence : {A : UU l₁}
+  → (R : A → A → UU l₂) → UU (l₁ ⊔ l₂)
+equivalence R = reflexive R × symmetric R × transitive R
+
+_≡_mod_ : ℕ → ℕ → ℕ → UU
 x ≡ y mod k = k ∣ distℕ x y
 
-{-
-mod-reflexive :
-  (k : ℕ) → {!!}
-mod-reflexive k {x} = 0ℕ , right-unit-law-mulℕ k ∙ distℕ-refl x
- 
-mod-sym :
-  (k : ℕ) → {!!}
-mod-sym k {x} {y} (l , k*l≡distℕxy) = l , k*l≡distℕxy ∙ distℕ-sym x y
--}
+mod-refl : (k : ℕ)
+  → (x : ℕ) → x ≡ x mod k 
+mod-refl k x = (0ℕ , unitʳ-* k ∙ distℕ-refl x)
+
+mod-sym : (k : ℕ)
+  (x y : ℕ) → x ≡ y mod k → y ≡ x mod k
+mod-sym k x y (l , k*l≡distℕxy) = (l , k*l≡distℕxy ∙ distℕ-sym x y)
+
+postulate
+  mod-trans : (k : ℕ)
+    (x y z : ℕ) → x ≡ y mod k → y ≡ z mod k → x ≡ z mod k
+
+mod-equiv : (k : ℕ)
+  → equivalence (λ x y → x ≡ y mod k)
+mod-equiv k = ((mod-refl k , mod-sym k) , mod-trans k)
 
 -- 7.3 The standard finite types
 
@@ -65,11 +71,11 @@ classical-Fin k = Σ x ∶ ℕ , (x < k)
 
 Fin' : ℕ → UU
 Fin' 0ℕ = Φ
-Fin' (succℕ k) = Fin' k ∔ 𝟏
+Fin' (succℕ k) = Fin' k ⊎ 𝟏
 
-★' : {k : ℕ}
+pt' : {k : ℕ}
   → Fin' (succℕ k)
-★' = inr ＊
+pt' = inr ＊
 
 𝓲' : {k : ℕ}
   → Fin' k → Fin' (succℕ k)
@@ -81,54 +87,54 @@ Fin' (succℕ k) = Fin' k ∔ 𝟏
 ι' (succℕ k) (inr ＊) = k
 
 data Fin : ℕ → UU where
-  ★ : {k : ℕ} → Fin (succℕ k)
+  pt : {k : ℕ} → Fin (succℕ k)
   𝓲  : {k : ℕ} → Fin k → Fin (succℕ k)
 
-ind-Fin : {P : {k : ℕ} → Fin k → UU i}
+ind-Fin : {P : {k : ℕ} → Fin k → UU l₁}
   → (g : (k : ℕ) (x : Fin k) → P {k} x → P {succℕ k} (𝓲 x))
-  → (p : (k : ℕ) → P {succℕ k} ★)
+  → (p : (k : ℕ) → P {succℕ k} pt)
   → {k : ℕ} (x : Fin k) → P {k} x
-ind-Fin g p {succℕ k} ★    = p k
+ind-Fin g p {succℕ k} pt    = p k
 ind-Fin g p {succℕ k} (𝓲 x) = g k x (ind-Fin g p {k} x)
 
 ι : {k : ℕ} → Fin k → ℕ
-ι {succℕ k} ★ = k
+ι {succℕ k} pt = k
 ι {succℕ k} (𝓲 x) = ι {k} x
 
 ι-inj : {k : ℕ}
   → (x y : Fin k)
   → ι {k} x ≡ ι {k} y → x ≡ y
-ι-inj ★ ★ p = refl ★
-ι-inj ★ (𝓲 y) p = ex-falso (g p)
+ι-inj pt pt p = refl pt
+ι-inj pt (𝓲 y) p = ex-falso (g p)
   where
     postulate
       g : {k : ℕ} {y : Fin k}
-        → ι {succℕ k} ★ ≢ ι {succℕ k} (𝓲 y)
-ι-inj (𝓲 x) ★ p = ex-falso (f p)
+        → ι {succℕ k} pt ≢ ι {succℕ k} (𝓲 y)
+ι-inj (𝓲 x) pt p = ex-falso (f p)
   where
     postulate
       f : {k : ℕ} {x : Fin k}
-        → ι {succℕ k} (𝓲 x) ≢ ι {succℕ k} ★
+        → ι {succℕ k} (𝓲 x) ≢ ι {succℕ k} pt
 ι-inj (𝓲 x) (𝓲 y) p = ap 𝓲 (ι-inj x y p)
 
 -- 7.4 The natrual numbers modulo k+1
 
-is-split-surjective : {A : UU i} {B : UU j}
-  → (A → B) → UU (i ⊔ j)
+is-split-surjective : {A : UU l₁} {B : UU l₂}
+  → (A → B) → UU (l₁ ⊔ l₂)
 is-split-surjective {A = A} {B = B} f
   = (b : B) → Σ a ∶ A , (f a ≡ b)
 
 zero : {k : ℕ}
   → Fin (succℕ k)
-zero {0ℕ} = ★
+zero {0ℕ} = pt
 zero {succℕ k} = 𝓲 (zero {k})
 
 skip-zero : {k : ℕ}
   → Fin k → Fin (succℕ k)
-skip-zero {succℕ k} ★ = ★
+skip-zero {succℕ k} pt = pt
 skip-zero {succℕ k} (𝓲 x) = 𝓲 (skip-zero {k} x)
 
 succ : {k : ℕ}
   → Fin k → Fin k
-succ {succℕ k} ★ = zero {k}
+succ {succℕ k} pt = zero {k}
 succ {succℕ k} (𝓲 x) = skip-zero {k} x

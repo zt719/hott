@@ -3,12 +3,12 @@ module 03-Natural-Numbers where
 open import 02-Dependent-Function-Types public
 
 -- 3.1 The formal specification of the type of ℕ
-data ℕ : UU₀ where
+data ℕ : UU where
   0ℕ : ℕ   
   succℕ : ℕ → ℕ
 {-# BUILTIN NATURAL ℕ #-}
 
-indℕ : {P : ℕ → UU i}
+indℕ : {P : ℕ → UU l₁}
   → P 0ℕ
   → ((n : ℕ) → P n → P (succℕ n))
   → ((n : ℕ ) → P n)
@@ -43,13 +43,15 @@ succℕ m * n = m * n + n
 {-# BUILTIN NATTIMES _*_ #-}
 
 minℕ : ℕ → ℕ → ℕ
-minℕ 0ℕ n = 0ℕ
-minℕ m 0ℕ = 0ℕ
+minℕ 0ℕ 0ℕ = 0ℕ
+minℕ 0ℕ (succℕ n) = 0ℕ
+minℕ (succℕ m) 0ℕ = 0ℕ
 minℕ (succℕ m) (succℕ n) = succℕ (minℕ m n)
 
 maxℕ : ℕ → ℕ → ℕ
-maxℕ 0ℕ n = n
-maxℕ m 0ℕ = m
+maxℕ 0ℕ 0ℕ = 0ℕ
+maxℕ 0ℕ (succℕ n) = succℕ n
+maxℕ (succℕ m) 0ℕ = succℕ m
 maxℕ (succℕ m) (succℕ n) = succℕ (maxℕ m n)
 
 triℕ : ℕ → ℕ
@@ -62,9 +64,9 @@ facℕ (succℕ n) = facℕ n * succℕ n
 
 binomialℕ : ℕ → ℕ → ℕ
 binomialℕ 0ℕ 0ℕ = succℕ 0ℕ
-binomialℕ 0ℕ (succℕ m) = 0ℕ
-binomialℕ (succℕ n) 0ℕ = 0ℕ
-binomialℕ (succℕ n) (succℕ m)
+binomialℕ 0ℕ (succℕ n) = 0ℕ
+binomialℕ (succℕ m) 0ℕ = 0ℕ
+binomialℕ (succℕ m) (succℕ n)
   = binomialℕ n m + binomialℕ n (succℕ m)
 
 fibℕ : ℕ → ℕ
