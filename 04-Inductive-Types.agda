@@ -133,7 +133,7 @@ uncurry = ev-pair
 
 _×_ : (A : UU l₁) (B : UU l₂) → UU (l₁ ⊔ l₂)
 A × B = Σ x ∶ A , B
-infixl 2 _×_
+infixr 2 _×_
 
 ind× : {A : UU l₁} {B : UU l₂} {P : A × B → UU l₃}
   → ((x : A) (y : B) → P (x , y))

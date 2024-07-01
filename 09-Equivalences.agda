@@ -4,73 +4,69 @@ open import 08-Decidability public
 
 -- 9.1 Homotopies
 
+infix  4 _~_
 _~_ : {A : UU l₁} {B : A → UU l₂}
   → (f g : (x : A) → B x) → UU (l₁ ⊔ l₂)
 f ~ g = (x : _) → f x ≡ g x
-infix  4 _~_
 
 neg-neg-bool : neg-bool ∘ neg-bool ~ id
 neg-neg-bool false = refl false
 neg-neg-bool true  = refl true
 
-_~~_ : {A : UU l₁} {B : A → UU l₂} {f g : (x : A) → B x}
-  → (H K : f ~ g) → UU (l₁ ⊔ l₂)
-H ~~ K = (x : _) → H x ≡ K x
-
-refl-h : {A : UU l₁} {B : A → UU l₂} {f : (x : A) → B x}
+refl-htpy : {A : UU l₁} {B : A → UU l₂} {f : (x : A) → B x}
   → f ~ f
-refl-h x = refl _
+refl-htpy x = refl _
 
-inv-h : {A : UU l₁} {B : A → UU l₂} {f g : (x : A) → B x}
+inv-htpy : {A : UU l₁} {B : A → UU l₂} {f g : (x : A) → B x}
   → f ~ g → g ~ f
-inv-h H x = inv (H x)
+inv-htpy H x = inv (H x)
 
-concat-h : {A : UU l₁} {B : A → UU l₂} {f g h : (x : A) → B x}
+concat-htpy : {A : UU l₁} {B : A → UU l₂} {f g h : (x : A) → B x}
   → f ~ g → g ~ h → f ~ h
-concat-h H K x = H x ∙ K x
+concat-htpy H K x = H x ∙ K x
 
-_∙ʰ_ = concat-h
+_∙ᴴ_ = concat-htpy
 
-assoc-h : {A : UU l₁} {B : A → UU l₂} {f g h s : (x : A) → B x}
+assoc-htpy : {A : UU l₁} {B : A → UU l₂} {f g h s : (x : A) → B x}
   → (H : f ~ g) (K : g ~ h) (L : h ~ s)
-  → (H ∙ʰ K) ∙ʰ L ~ H ∙ʰ (K ∙ʰ L)
-assoc-h H K L x = assoc (H x) (K x) (L x)
+  → (H ∙ᴴ K) ∙ᴴ L ~ H ∙ᴴ (K ∙ᴴ L)
+assoc-htpy H K L x = assoc (H x) (K x) (L x)
 
-unitˡ-h : {A : UU l₁} {B : A → UU l₂}
+left-unit-htpy : {A : UU l₁} {B : A → UU l₂}
   → {f g : (x : A) → B x}
   → (H : f ~ g)
-  → refl-h ∙ʰ H ~ H
-unitˡ-h H x = unitˡ (H x)
+  → refl-htpy ∙ᴴ H ~ H
+left-unit-htpy H x = left-unit (H x)
 
-unitʳ-h : {A : UU l₁} {B : A → UU l₂}
+right-unit-htpy : {A : UU l₁} {B : A → UU l₂}
   → {f g : (x : A) → B x}
   → (H : f ~ g)
-  → H ∙ʰ refl-h ~ H
-unitʳ-h H x = unitʳ (H x)
+  → H ∙ᴴ refl-htpy ~ H
+right-unit-htpy H x = right-unit (H x)
 
-invˡ-h : {A : UU l₁} {B : A → UU l₂} {f g : (x : A) → B x}
+left-inv-htpy : {A : UU l₁} {B : A → UU l₂} {f g : (x : A) → B x}
   → (H : f ~ g)
-  → inv-h H ∙ʰ H ~ refl-h
-invˡ-h H x = invˡ (H x)
+  → inv-htpy H ∙ᴴ H ~ refl-htpy
+left-inv-htpy H x = left-inv (H x)
 
-invʳ-h : {A : UU l₁} {B : A → UU l₂} {f g : (x : A) → B x}
+right-inv-htpy : {A : UU l₁} {B : A → UU l₂} {f g : (x : A) → B x}
   → (H : f ~ g)
-  → H ∙ʰ inv-h H ~ refl-h
-invʳ-h H x = invʳ (H x)
+  → H ∙ᴴ inv-htpy H ~ refl-htpy
+right-inv-htpy H x = right-inv (H x)
 
-whiskˡ : {A : UU l₁} {B : UU l₂} {C : UU l₃} {f g : A → B}
+left-whisk : {A : UU l₁} {B : UU l₂} {C : UU l₃} {f g : A → B}
   → (h : B → C) (H : f ~ g)
   → h ∘ f ~ h ∘ g
-whiskˡ h H x = ap h (H x)
+left-whisk h H x = ap h (H x)
 
-_∙ˡ_ = whiskˡ
+_∙l_ = left-whisk
 
-whiskʳ : {A : UU l₁} {B : UU l₂} {C : UU l₃} {g h : B → C}
+right-whisk : {A : UU l₁} {B : UU l₂} {C : UU l₃} {g h : B → C}
   → (H : g ~ h) (f : A → B)
   → g ∘ f ~ h ∘ f
-whiskʳ H f x = H (f x)
+right-whisk H f x = H (f x)
 
-_∙ʳ_ = whiskʳ
+_∙r_ = right-whisk
 
 -- 9.2 Bi-invertible maps
 
@@ -111,10 +107,10 @@ has-inverse→is-equiv (g , H , K)
 is-equiv→has-inverse : {A : UU l₁} {B : UU l₂}
   → (f : A → B) → is-equiv f → has-inverse f
 is-equiv→has-inverse f ((g , G) , (h , H))
-  = g , (G , (K ∙ʳ f) ∙ʰ H)
+  = g , (G , (K ∙r f) ∙ᴴ H)
   where
   K : g ~ h
-  K = inv-h (H ∙ʳ g) ∙ʰ (h ∙ˡ G)
+  K = inv-htpy (H ∙r g) ∙ᴴ (h ∙l G)
 
 refl-equiv : {A : UU l₁}
   → A ≃ A
@@ -210,10 +206,10 @@ A⊎B≃B
 
 EqΣ : {A : UU l₁} {B : A → UU l₂}
   → Σ x ∶ A , (B x)
-  → Σ x ∶ A , (B x)
+  → Σ x ∶ A , (B x)  
   → UU (l₁ ⊔ l₂)
-EqΣ {B = B} s t
-  = Σ α ∶ (pr₁ s ≡ pr₁ t) , (tr B α (pr₂ s) ≡ pr₂ t)
+EqΣ (a , b) (a' , b')
+  = Σ α ∶ a ≡ a' , (tr _ α b ≡ b')
 
 refl-EqΣ : {A : UU l₁} {B : A → UU l₂}
   → (s : Σ x ∶ A , B x) → EqΣ s s
@@ -227,6 +223,8 @@ pair-eq : {A : UU l₁} {B : A → UU l₂}
   → s ≡ t → EqΣ s t
 pair-eq s .s (refl .s) = refl-EqΣ s
 
+≡→EqΣ = pair-eq
+
 eq-pair : {A : UU l₁} {B : A → UU l₂}
   → (s t : Σ x ∶ A , B x)
   → EqΣ s t → s ≡ t
@@ -235,6 +233,8 @@ eq-pair (x , y) (x' , y') = indΣ f
   f : (p : x ≡ x') → tr _ p y ≡ y' → (x , y) ≡ (x' , y')
   f (refl .x) (refl .y) = refl (x , y)
 
+EqΣ→≡ = eq-pair
+
 pair-eq-is-sec : {A : UU l₁} {B : A → UU l₂}
   → (s t : Σ x ∶ A , B x)
   → sec (pair-eq s t)
@@ -242,17 +242,17 @@ pair-eq-is-sec (x , y) (x' , y')
   = eq-pair (x , y) (x' , y')
   , λ{ ((refl .x) , (refl .y)) → refl (refl x , refl y) }
 
-pair-eq-is-retr : {A : UU l₁} {B : A → UU l₂}
+pair-eq-isʳetr : {A : UU l₁} {B : A → UU l₂}
   → (s t : Σ x ∶ A , B x)
   → retr (pair-eq s t)
-pair-eq-is-retr (x , y) (x' , y')
+pair-eq-isʳetr (x , y) (x' , y')
   = eq-pair (x , y) (x' , y')
   , λ{ (refl .(x , y)) → refl (refl (x , y)) }
 
 pair-eq-is-equiv : {A : UU l₁} {B : A → UU l₂}
   → (s t : Σ x ∶ A , B x)
   → is-equiv (pair-eq s t)
-pair-eq-is-equiv s t = pair-eq-is-sec s t , pair-eq-is-retr s t
+pair-eq-is-equiv s t = pair-eq-is-sec s t , pair-eq-isʳetr s t
 
 -- Exercises
 
@@ -286,9 +286,9 @@ tr-is-equiv B (refl x)
 
 constb-is-not-equiv :
   (b : bool) → ¬ is-equiv (const {A = bool} b)
-constb-is-not-equiv false ((s , is-sec) , r-is-retr)
+constb-is-not-equiv false ((s , is-sec) , r-isʳetr)
   = f≢t (is-sec true)
-constb-is-not-equiv true  ((s , is-sec) , r-is-retr)
+constb-is-not-equiv true  ((s , is-sec) , r-isʳetr)
   = f≢t (inv (is-sec false))
 
 postulate
@@ -304,25 +304,25 @@ postulate
 9-3a f g H = to , from
   where
   to : is-equiv f → is-equiv g
-  to ((s , is-sec) , (r , is-retr))
-    = (s , (inv-h (H ∙ʳ s) ∙ʰ is-sec))
-    , (r , ((r ∙ˡ (inv-h H)) ∙ʰ is-retr))
+  to ((s , is-sec) , (r , isʳetr))
+    = (s , (inv-htpy (H ∙r s) ∙ᴴ is-sec))
+    , (r , ((r ∙l (inv-htpy H)) ∙ᴴ isʳetr))
   from : is-equiv g → is-equiv f
-  from ((s , is-sec) , (r , is-retr))
-    = (s , ((H ∙ʳ s) ∙ʰ is-sec))
-    , (r , ((r ∙ˡ H) ∙ʰ is-retr))
+  from ((s , is-sec) , (r , isʳetr))
+    = (s , ((H ∙r s) ∙ᴴ is-sec))
+    , (r , ((r ∙l H) ∙ᴴ isʳetr))
 
 9-4a : {A : UU l₁} {B : UU l₂} {X : UU l₃}
   → (f : A → X) (g : B → X) (h : A → B)
     (H : f ~ g ∘ h) (sec-s : sec h)
   → g ~ f ∘ (pr₁ sec-s)
-9-4a f g h H (s , is-sec) = inv-h ((H ∙ʳ s) ∙ʰ (g ∙ˡ is-sec))
+9-4a f g h H (s , is-sec) = inv-htpy ((H ∙r s) ∙ᴴ (g ∙l is-sec))
 
 9-4b : {A : UU l₁} {B : UU l₂} {X : UU l₃}
   → (f : A → X) (g : B → X) (h : A → B)
-    (H : f ~ g ∘ h) (retr-r : retr g)
-  → h ~ (pr₁ retr-r) ∘ f
-9-4b f g h H (r , is-retr) = inv-h ((r ∙ˡ H) ∙ʰ (is-retr ∙ʳ h))
+    (H : f ~ g ∘ h) (retrʳ : retr g)
+  → h ~ (pr₁ retrʳ) ∘ f
+9-4b f g h H (r , isʳetr) = inv-htpy ((r ∙l H) ∙ᴴ (isʳetr ∙r h))
 
 Σ-swap1 : {A : UU l₁} {B : UU l₂} {C : A → B → UU l₃}
   → Σ x ∶ A , Σ y ∶ B , C x y ≃ Σ y ∶ B , Σ x ∶ A , C x y
@@ -338,12 +338,12 @@ postulate
   , ((λ{ ((x , Cx) , Bx) → ((x , Bx) , Cx) }) , λ{ ((x , Cx) , Bx) → refl ((x , Cx) , Bx) })
 
 id⊎id~id⊎ : {A : UU l₁} {B : UU l₂}
-  → id {A = A} ⊎ᶠ id {A = B} ~ id {A = A ⊎ B}
+  → id ⊎ᶠ id ~ id {A = A ⊎ B}
 id⊎id~id⊎ (inl x) = refl (inl x)
 id⊎id~id⊎ (inr y) = refl (inr y)
 
-∘⊎∘~⊎∘⊎ : {i j k i' j' k' : Level}
-  → {A : UU l₁} {A' : UU l₂} {A'' : UU l₃}
+∘⊎∘~⊎∘⊎ : 
+  {A : UU l₁} {A' : UU l₂} {A'' : UU l₃}
   → {B : UU l₄} {B' : UU l₅} {B'' : UU l₆}
   → (f : A → A') (f' : A' → A'')
   → (g : B → B') (g' : B' → B'')
@@ -351,13 +351,13 @@ id⊎id~id⊎ (inr y) = refl (inr y)
 ∘⊎∘~⊎∘⊎ f f' g g' (inl x) = refl (inl (f' (f x)))
 ∘⊎∘~⊎∘⊎ f f' g g' (inr y) = refl (inr (g' (g y)))
 
-_⊎ʰ_ : {A : UU l₁} {A' : UU l₂}
+_⊎ᴴ_ : {A : UU l₁} {A' : UU l₂}
   → {B : UU l₃} {B' : UU l₄}
   → {f f' : A → A'}{g g' : B → B'}
   → (H : f ~ f') (K : g ~ g')
   → f ⊎ᶠ g ~ f' ⊎ᶠ g'
-(H ⊎ʰ K) (inl x) = ap inl (H x)
-(H ⊎ʰ K) (inr y) = ap inr (K y)
+(H ⊎ᴴ K) (inl x) = ap inl (H x)
+(H ⊎ᴴ K) (inr y) = ap inr (K y)
 
 {-
 ⊎ᶠ-is-equiv : {A : UU l₁} {A' : UU l₂}
@@ -366,8 +366,8 @@ _⊎ʰ_ : {A : UU l₁} {A' : UU l₂}
   → is-equiv f → is-equiv g
   → is-equiv (f ⊎ᶠ g)
 ⊎ᶠ-is-equiv {i} {j} {k} {l} f g
-  ((fs , fs-is-sec) , (fr , fr-is-retr))
-  ((gs , gs-is-sec) , (gr , gr-is-retr))
+  ((fs , fs-is-sec) , (fr , fr-isʳetr))
+  ((gs , gs-is-sec) , (gr , gr-isʳetr))
   = (fs ⊎ᶠ gs , {!!})
   , (fr ⊎ᶠ gr , {!!})
 -}
@@ -376,38 +376,36 @@ _×ᶠ_ : {A : UU l₁} {A' : UU l₂}
   → {B : UU l₃} {B' : UU l₄}
   → (f : A → A') (g : B → B')
   → A × B → A' × B'
-(f ×ᶠ g) (a , b) = (f a , g b)
+(f ×ᶠ g) (a , b) = f a , g b
 
-id×id~id× : {A : UU l₁} {B : UU l₂}
+id×ᶠid~id×ᶠ : {A : UU l₁} {B : UU l₂}
   → id {A = A} ×ᶠ id {A = B} ~ id {A = A × B}
-id×id~id× (a , b) = refl (a , b)
+id×ᶠid~id×ᶠ (a , b) = refl (a , b)
 
-∘×∘~×∘× : {i j k i' j' k' : Level}
-  → {A : UU l₁} {A' : UU l₂} {A'' : UU l₃}
+∘×ᶠ∘~×ᶠ∘×ᶠ :
+  {A : UU l₁} {A' : UU l₂} {A'' : UU l₃}
   → {B : UU l₃} {B' : UU l₅} {B'' : UU l₆}
   → (f : A → A') (f' : A' → A'')
   → (g : B → B') (g' : B' → B'')
   → (f' ∘ f) ×ᶠ (g' ∘ g) ~ (f' ×ᶠ g') ∘ (f ×ᶠ g)
-∘×∘~×∘× f f' g g' (a , b) = refl (f' (f a) , g' (g b))
+∘×ᶠ∘~×ᶠ∘×ᶠ f f' g g' (a , b) = refl (f' (f a) , g' (g b))
 
-ap₂ : {A : UU l₁} {B : UU l₂} {C : UU l₃}
-  → (f : A → B → C) {x y : A} {u v : B}
-  → x ≡ y → u ≡ v → f x u ≡ f y v
-ap₂ f (refl x) (refl u) = refl (f x u)
+Eq× :  {A : UU l₁} {B : UU l₂}
+  → (x y : A × B)
+  → UU (l₁ ⊔ l₂)
+Eq× (a , b) (a' , b') = a ≡ a' × b ≡ b'
 
-_×ʰ_ : {A : UU l₁} {A' : UU l₂}
+Eq×→≡ : {A : UU l₁} {B : UU l₂}
+  → (x y : A × B)
+  → Eq× x y → x ≡ y
+Eq×→≡ (x , x₁) (.x , .x₁) (refl .x , refl .x₁) = refl (x , x₁)
+
+_×ᴴ_ : {A : UU l₁} {A' : UU l₂}
   → {B : UU l₃} {B' : UU l₄}
   → {f f' : A → A'} {g g' : B → B'}
   → (H : f ~ f') (K : g ~ g')
   → f ×ᶠ g ~ f' ×ᶠ g'
-(H ×ʰ K) (a , b) = ap₂ _,_ (H a) (K b)
-
-to : {k l : ℕ}
-  → Fin (k + l) → Fin k ⊎ Fin l
-to {l = 0ℕ} x = inl x
-to {l = succℕ l} pt = inr pt
-to {l = succℕ l} (𝓲 x) = (id ⊎ᶠ 𝓲) (to {l = l} x) 
-
+_×ᴴ_ {f = f} {f'} {g} {g'} H K (a , b) = Eq×→≡ (f a , g b) (f' a , g' b) (H a , K b)
 
 {-
 Fin+≃Fin⊎Fin : {k l : ℕ}

@@ -22,7 +22,7 @@ ind≡ p a (refl a) = p
 
 concat : {A : UU l₁} {x y z : A}
   → x ≡ y → y ≡ z → x ≡ z
-concat (refl x) (refl x) = refl x
+concat (refl x) q = q
 
 _∙_ = concat
 infixl 7 _∙_
@@ -36,25 +36,25 @@ assoc : {A : UU l₁} {x y z w : A}
   → (p ∙ q) ∙ r ≡ p ∙ (q ∙ r)
 assoc (refl x) (refl x) (refl x) = refl (refl x)
 
-unitˡ : {A : UU l₁} {x y : A}
+left-unit : {A : UU l₁} {x y : A}
   → (p : x ≡ y)
   → refl x ∙ p ≡ p
-unitˡ (refl x) = refl (refl x)
+left-unit (refl x) = refl (refl x)
 
-unitʳ : {A : UU l₁} {x y : A}
+right-unit : {A : UU l₁} {x y : A}
   → (p : x ≡ y)
   → p ∙ refl y ≡ p
-unitʳ (refl x) = refl (refl x)
+right-unit (refl x) = refl (refl x)
 
-invˡ : {A : UU l₁} {x y : A}
+left-inv : {A : UU l₁} {x y : A}
   → (p : x ≡ y)
   → inv p ∙ p ≡ refl y
-invˡ (refl x) = refl (refl x)
+left-inv (refl x) = refl (refl x)
 
-invʳ : {A : UU l₁} {x y : A}
+right-inv : {A : UU l₁} {x y : A}
   → (p : x ≡ y)
   → p ∙ inv p ≡ refl x
-invʳ (refl x) = refl (refl x)
+right-inv (refl x) = refl (refl x)
 
 -- 5.3 The action on identification of functions
 
@@ -116,23 +116,23 @@ unique-refl a (a , refl a) = refl (a , refl a)
 
 --5.6 The laws of addition on ℕ
 
-unitˡ-+ : (n : ℕ)
+left-unit-+ : (n : ℕ)
   → 0 + n ≡ n
-unitˡ-+ 0ℕ = refl 0ℕ
-unitˡ-+ (succℕ n) = ap succℕ (unitˡ-+ n)
+left-unit-+ 0ℕ = refl 0ℕ
+left-unit-+ (succℕ n) = ap succℕ (left-unit-+ n)
 
-unitʳ-+ : (n : ℕ)
+right-unit-+ : (n : ℕ)
   → n + 0 ≡ n
-unitʳ-+ n = refl n
+right-unit-+ n = refl n
 
-succˡ-+ : (m n : ℕ)
+left-succ-+ : (m n : ℕ)
   → succℕ m + n ≡ succℕ (m + n)
-succˡ-+ m 0ℕ = refl (succℕ m)
-succˡ-+ m (succℕ n) = ap succℕ (succˡ-+ m n)
+left-succ-+ m 0ℕ = refl (succℕ m)
+left-succ-+ m (succℕ n) = ap succℕ (left-succ-+ m n)
 
-succʳ-+ : (m n : ℕ)
+right-succ-+ : (m n : ℕ)
   → m + succℕ n ≡ succℕ (m + n)
-succʳ-+ m n = refl (succℕ (m + n))
+right-succ-+ m n = refl (succℕ (m + n))
 
 assoc-+ : (m n k : ℕ)
   → (m + n) + k ≡ m + (n + k)
@@ -141,8 +141,8 @@ assoc-+ m n (succℕ k) = ap succℕ (assoc-+ m n k)
 
 com-+ : (m n : ℕ)
   → m + n ≡ n + m
-com-+ 0ℕ n = unitˡ-+ n
-com-+ (succℕ m) n = succˡ-+ m n ∙ ap succℕ (com-+ m n)
+com-+ 0ℕ n = left-unit-+ n
+com-+ (succℕ m) n = left-succ-+ m n ∙ ap succℕ (com-+ m n)
 
 -- Exercises
 
@@ -164,7 +164,7 @@ lift : {A : UU l₁} {a x : A}
   → (a , b) ≡ (x , tr B p b)
 lift B (refl a) b = refl (a , b)
 
-Mac-Lane-pentagon : {A : UU l₁} {a b c d e : A}
+Mac-lane-pentagon : {A : UU l₁} {a b c d e : A}
   → (p : a ≡ b) (q : b ≡ c) (r : c ≡ d) (s : d ≡ e)
   → let α₁ = (ap (λ t → t ∙ s) (assoc p q r))
         α₂ = (assoc p (q ∙ r) s)
@@ -172,66 +172,66 @@ Mac-Lane-pentagon : {A : UU l₁} {a b c d e : A}
         α₄ = (assoc (p ∙ q) r s)
         α₅ = (assoc p q (r ∙ s))
     in ((α₁ ∙ α₂) ∙ α₃) ≡ (α₄ ∙ α₅)
-Mac-Lane-pentagon (refl x) (refl x) (refl x) (refl x) = refl (refl (refl x))
+Mac-lane-pentagon (refl x) (refl x) (refl x) (refl x) = refl (refl (refl x))
 
-unitˡ-* : (m : ℕ)
+left-unit-* : (m : ℕ)
   → 0 * m ≡ 0
-unitˡ-* m = refl 0ℕ
+left-unit-* m = refl 0ℕ
 
-unitʳ-* : (m : ℕ)
+right-unit-* : (m : ℕ)
   → m * 0 ≡ 0
-unitʳ-* 0ℕ = refl 0ℕ
-unitʳ-* (succℕ m) = unitʳ-* m
+right-unit-* 0ℕ = refl 0ℕ
+right-unit-* (succℕ m) = right-unit-* m
 
-idˡ-* : (m : ℕ)
+left-id-* : (m : ℕ)
   → 1 * m ≡ m
-idˡ-* 0ℕ = refl 0ℕ
-idˡ-* (succℕ m) = ap succℕ (idˡ-* m)
+left-id-* 0ℕ = refl 0ℕ
+left-id-* (succℕ m) = ap succℕ (left-id-* m)
 
-idʳ-* : (m : ℕ)
+right-id-* : (m : ℕ)
   → m * 1 ≡ m
-idʳ-* 0ℕ = refl 0ℕ
-idʳ-* (succℕ m) = ap succℕ (idʳ-* m)
+right-id-* 0ℕ = refl 0ℕ
+right-id-* (succℕ m) = ap succℕ (right-id-* m)
 
-succˡ-* : (m n : ℕ)
+left-succ-* : (m n : ℕ)
   → succℕ m * n ≡ m * n + n
-succˡ-* m n = refl (m * n + n)
+left-succ-* m n = refl (m * n + n)
 
-succʳ-* : (m n : ℕ)
+right-succ-* : (m n : ℕ)
   → m * succℕ n ≡ m + m * n
-succʳ-* 0ℕ n = refl 0ℕ
-succʳ-* (succℕ m) n
-  = ap (λ t → succℕ (t + n)) (succʳ-* m n)
+right-succ-* 0ℕ n = refl 0ℕ
+right-succ-* (succℕ m) n
+  = ap (λ t → succℕ (t + n)) (right-succ-* m n)
   ∙ ap succℕ (assoc-+ m (m * n) n)
-  ∙ inv (succˡ-+ m ((m * n) + n))
+  ∙ inv (left-succ-+ m ((m * n) + n))
 
 com-* : (m n : ℕ)
   → m * n ≡ n * m
-com-* 0ℕ n = inv (unitʳ-* n)
+com-* 0ℕ n = inv (right-unit-* n)
 com-* (succℕ m) n
   = (com-+ (m * n) n)
   ∙ ap (n +_) (com-* m n)
-  ∙ inv (succʳ-* n m)
+  ∙ inv (right-succ-* n m)
 
-*+-distrˡ : (m n k : ℕ)
+*+-left-distr : (m n k : ℕ)
   → m * (n + k) ≡ m * n + m * k
-*+-distrˡ m n 0ℕ = ap (m * n +_) (inv (unitʳ-* m))
-*+-distrˡ m n (succℕ k)
-  = succʳ-* m (n + k)
-  ∙ ap (m +_) (*+-distrˡ m n k)
+*+-left-distr m n 0ℕ = ap (m * n +_) (inv (right-unit-* m))
+*+-left-distr m n (succℕ k)
+  = right-succ-* m (n + k)
+  ∙ ap (m +_) (*+-left-distr m n k)
   ∙ inv (assoc-+ m (m * n) (m * k))
   ∙ ap (_+ m * k) (com-+ m (m * n))
   ∙ assoc-+ (m * n) m (m * k)
-  ∙ ap (m * n +_) (inv (succʳ-* m k))
+  ∙ ap (m * n +_) (inv (right-succ-* m k))
 
-*+-distrʳ : (m n k : ℕ)
+*+-right-distr : (m n k : ℕ)
   → (m + n) * k ≡ m * k + n * k
-*+-distrʳ m n 0ℕ =
-  unitʳ-* (m + n)
-  ∙ inv (ap (m * 0 +_) (unitʳ-* n) ∙ unitʳ-* m)
-*+-distrʳ m n (succℕ k)
-  = succʳ-* (m + n) k
-  ∙ ap (m + n +_) (*+-distrʳ m n k)
+*+-right-distr m n 0ℕ =
+  right-unit-* (m + n)
+  ∙ inv (ap (m * 0 +_) (right-unit-* n) ∙ right-unit-* m)
+*+-right-distr m n (succℕ k)
+  = right-succ-* (m + n) k
+  ∙ ap (m + n +_) (*+-right-distr m n k)
   ∙ assoc-+ m n (m * k + n * k)
   ∙ ap (m +_)
     ( inv (assoc-+ n (m * k) (n * k))
@@ -239,8 +239,8 @@ com-* (succℕ m) n
     ∙ assoc-+ (m * k) n (n * k)
     )
   ∙ inv
-    ( (ap (_+ n * succℕ k) (succʳ-* m k))
-    ∙ (ap (m + m * k +_) (succʳ-* n k))
+    ( (ap (_+ n * succℕ k) (right-succ-* m k))
+    ∙ (ap (m + m * k +_) (right-succ-* n k))
     ∙ (assoc-+ m (m * k) (n + n * k ))
     )
     

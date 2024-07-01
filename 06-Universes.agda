@@ -59,9 +59,7 @@ inj-+k {k = succℕ k} p = inj-+k (pr₂ peanos7 p)
 postulate
   *sk-inj : {m n k : ℕ}
     → m * succℕ k ≡ n * succℕ k → m ≡ n
--- *sk-inj {m} {n} {k = 0ℕ} p = inv (*-idʳ m) ∙ p ∙ *-idʳ n
--- *sk-inj {m} {n} {k = succℕ k} p = {!!}
-
+    
 6-1a2 : {m n k : ℕ}
   → m ≡ n ↔ m * succℕ k ≡ n * succℕ k
 6-1a2 {k = k} = (ap (_* succℕ k) , *sk-inj)

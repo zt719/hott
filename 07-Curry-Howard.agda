@@ -8,20 +8,20 @@ _∣_ : (d n : ℕ) → UU₀
 d ∣ n = Σ k ∶ ℕ , (d * k ≡ n)
 
 three-divides-six : 3 ∣ 6
-three-divides-six = (2 , refl 6)
+three-divides-six = 2 , refl 6
 
 one-dividesℕ : (x : ℕ) → 1 ∣ x
-one-dividesℕ x = (x , idˡ-* x)
+one-dividesℕ x = x , left-id-* x
 
 -- Proposition 7.1.5
 
 p7-1-5 : (x y d : ℕ)
   → d ∣ x × d ∣ y
   → d ∣ (x + y)
-p7-1-5 x y d ((k , d*k≡x) , (l , d*l≡y)) = ((k + l) , α ∙ β ∙ γ)
+p7-1-5 x y d ((k , d*k≡x) , (l , d*l≡y)) = k + l , α ∙ β ∙ γ
   where
   α : d * (k + l) ≡ d * k + d * l
-  α = *+-distrˡ d k l
+  α = *+-left-distr d k l
   β : d * k + d * l ≡ x + d * l
   β = ap (_+ d * l) d*k≡x
   γ : x + d * l ≡ x + y
@@ -29,40 +29,40 @@ p7-1-5 x y d ((k , d*k≡x) , (l , d*l≡y)) = ((k + l) , α ∙ β ∙ γ)
 
 -- 7.2 The congruence relations on ℕ
 
-reflexive : {A : UU l₁}
+is-refl-R : {A : UU l₁}
   → (R : A → A → UU l₂) → UU (l₁ ⊔ l₂)
-reflexive R = (x : _) → R x x
+is-refl-R R = (x : _) → R x x
 
-symmetric : {A : UU l₁}
+is-sym-R : {A : UU l₁}
   → (R : A → A → UU l₂) → UU (l₁ ⊔ l₂)
-symmetric R = (x y : _) → R x y → R y x
+is-sym-R R = (x y : _) → R x y → R y x
 
-transitive : {A : UU l₁}
+is-trans-R : {A : UU l₁}
   → (R : A → A → UU l₂) → UU (l₁ ⊔ l₂)
-transitive R = (x y z : _) → R x y → R y z → R x z
+is-trans-R R = (x y z : _) → R x y → R y z → R x z
 
-equivalence : {A : UU l₁}
+is-equiv-R : {A : UU l₁}
   → (R : A → A → UU l₂) → UU (l₁ ⊔ l₂)
-equivalence R = reflexive R × symmetric R × transitive R
+is-equiv-R R = is-refl-R R × is-sym-R R × is-trans-R R
 
 _≡_mod_ : ℕ → ℕ → ℕ → UU
 x ≡ y mod k = k ∣ distℕ x y
 
 mod-refl : (k : ℕ)
-  → (x : ℕ) → x ≡ x mod k 
-mod-refl k x = (0ℕ , unitʳ-* k ∙ distℕ-refl x)
+  → is-refl-R (_≡_mod k)
+mod-refl k x = 0ℕ , right-unit-* k ∙ distℕ-refl x
 
 mod-sym : (k : ℕ)
-  (x y : ℕ) → x ≡ y mod k → y ≡ x mod k
-mod-sym k x y (l , k*l≡distℕxy) = (l , k*l≡distℕxy ∙ distℕ-sym x y)
+  → is-sym-R (_≡_mod k)
+mod-sym k x y (l , k*l≡distℕxy) = l , k*l≡distℕxy ∙ distℕ-sym x y
 
 postulate
   mod-trans : (k : ℕ)
-    (x y z : ℕ) → x ≡ y mod k → y ≡ z mod k → x ≡ z mod k
+    → is-trans-R (_≡_mod k)
 
 mod-equiv : (k : ℕ)
-  → equivalence (λ x y → x ≡ y mod k)
-mod-equiv k = ((mod-refl k , mod-sym k) , mod-trans k)
+  → is-equiv-R (_≡_mod k)
+mod-equiv k = mod-refl k , mod-sym k , mod-trans k
 
 -- 7.3 The standard finite types
 
@@ -121,8 +121,8 @@ ind-Fin g p {succℕ k} (𝓲 x) = g k x (ind-Fin g p {k} x)
 
 is-split-surjective : {A : UU l₁} {B : UU l₂}
   → (A → B) → UU (l₁ ⊔ l₂)
-is-split-surjective {A = A} {B = B} f
-  = (b : B) → Σ a ∶ A , (f a ≡ b)
+is-split-surjective f
+  = (b : _) → Σ a ∶ _ , (f a ≡ b)
 
 zero : {k : ℕ}
   → Fin (succℕ k)
