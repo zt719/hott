@@ -2,16 +2,16 @@ module 08-Decidability where
 
 open import 07-Curry-Howard public
 
-is-decidable : UU l₁ → UU l₁
+is-decidable : UU ℓ₁ → UU ℓ₁
 is-decidable A = A ⊎ ¬ A
 
-𝟏-is-decidable : is-decidable 𝟏
-𝟏-is-decidable = inl ＊
+𝟙-is-decidable : is-decidable 𝟙
+𝟙-is-decidable = inl ＊
 
-Φ-is-decidable : is-decidable Φ
-Φ-is-decidable = inr id
+𝟘-is-decidable : is-decidable 𝟘
+𝟘-is-decidable = inr id
 
-⊎-is-decidable : {A : UU l₁} {B : UU l₂}
+⊎-is-decidable : {A : UU ℓ₁} {B : UU ℓ₂}
   → is-decidable A
   → is-decidable B
   → is-decidable (A ⊎ B)
@@ -20,7 +20,7 @@ is-decidable A = A ⊎ ¬ A
 ⊎-is-decidable (inr f) (inl b) = inl (inr b)
 ⊎-is-decidable (inr f) (inr g) = inr [ f , g ]
 
-×-is-decidable : {A : UU l₁} {B : UU l₂}
+×-is-decidable : {A : UU ℓ₁} {B : UU ℓ₂}
   → is-decidable A
   → is-decidable B
   → is-decidable (A × B)
@@ -29,7 +29,7 @@ is-decidable A = A ⊎ ¬ A
 ×-is-decidable (inr f) (inl b) = inr (f ∘ pr₁)
 ×-is-decidable (inr f) (inr g) = inr (f ∘ pr₁)
 
-→-is-decidable : {A : UU l₁} {B : UU l₂}
+→-is-decidable : {A : UU ℓ₁} {B : UU ℓ₂}
   → is-decidable A
   → is-decidable B
   → is-decidable (A → B)
@@ -40,16 +40,16 @@ is-decidable A = A ⊎ ¬ A
 
 Eqℕ-is-decidable : (m n : ℕ)
   → is-decidable (Eqℕ m n)
-Eqℕ-is-decidable 0ℕ 0ℕ = 𝟏-is-decidable
-Eqℕ-is-decidable 0ℕ (succℕ n) = Φ-is-decidable
-Eqℕ-is-decidable (succℕ m) 0ℕ = Φ-is-decidable
-Eqℕ-is-decidable (succℕ m) (succℕ n) = Eqℕ-is-decidable m n
+Eqℕ-is-decidable zero zero = 𝟙-is-decidable
+Eqℕ-is-decidable zero (suc n) = 𝟘-is-decidable
+Eqℕ-is-decidable (suc m) zero = 𝟘-is-decidable
+Eqℕ-is-decidable (suc m) (suc n) = Eqℕ-is-decidable m n
 
-has-decidable-eq : UU l₁ → UU l₁
+has-decidable-eq : UU ℓ₁ → UU ℓ₁
 has-decidable-eq A = (x y : A) → is-decidable (x ≡ y)
 
-↔-is-decidable : {A : UU l₁} {B : UU l₂}
+↔-is-decidable : {A : UU ℓ₁} {B : UU ℓ₂}
   → A ↔ B
   → is-decidable A ↔ is-decidable B
 ↔-is-decidable (f , g)
-  = (f ⊎ᶠ (g ~)) , (g ⊎ᶠ (f ~))
+  = f ⊎ᶠ (g ~) , g ⊎ᶠ (f ~)

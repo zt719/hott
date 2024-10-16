@@ -3,47 +3,48 @@ module 04-Inductive-Types where
 open import 03-Natural-Numbers public
 
 -- 4.2 The unit type
-data 𝟏 : UU where
-  ＊ : 𝟏 
+record 𝟙 : UU where
+  constructor ＊
+{-# BUILTIN UNIT 𝟙 #-}
 
-ind𝟏 : {P : 𝟏 → UU l₁}
-  → P ＊ → (x : 𝟏) → P x
-ind𝟏 p ＊ = p
+ind𝟙 : {P : 𝟙 → UU ℓ₁}
+  → P ＊ → (x : 𝟙) → P x
+ind𝟙 p ＊ = p
 
 -- 4.3 The empty type
-data Φ : UU where
+data 𝟘 : UU where
 
-indΦ : {P : Φ → UU l₁}
-  → (x : Φ) → P x
-indΦ = λ ()
+ind𝟘 : {P : 𝟘 → UU ℓ₁}
+  → (x : 𝟘) → P x
+ind𝟘 = λ ()
 
-ex-falso : {A : UU l₁}
-  → Φ → A
-ex-falso = indΦ
+ex-falso : {A : UU ℓ₁}
+  → 𝟘 → A
+ex-falso = ind𝟘
 
 -- 4.3.2 Negation
-¬_ : UU l₁ → UU l₁
-¬ A = A → Φ
+¬_ : UU ℓ₁ → UU ℓ₁
+¬ A = A → 𝟘
 
-¬¬_ : UU l₁ → UU l₁
-¬¬ A = ¬ A → Φ
+¬¬_ : UU ℓ₁ → UU ℓ₁
+¬¬ A = ¬ A → 𝟘
 
-is-empty : (A : UU l₁) → UU l₁ 
-is-empty A = A → Φ
+is-empty : (A : UU ℓ₁) → UU ℓ₁ 
+is-empty A = A → 𝟘
 
-_~ : {P : UU l₁} {Q : UU l₂}
+_~ : {P : UU ℓ₁} {Q : UU ℓ₂}
   → (P → Q)
   → ¬ Q → ¬ P
 (f ~) q~ p = q~ (f p)
 
 -- 4.4 Corpoducts
 
-data _⊎_ (A : UU l₁) (B : UU l₂) : UU (l₁ ⊔ l₂) where
+infixr 2 _⊎_
+data _⊎_ (A : UU ℓ₁) (B : UU ℓ₂) : UU (ℓ₁ ⊔ ℓ₂) where
   inl : A → A ⊎ B
   inr : B → A ⊎ B
-infixr 2 _⊎_
 
-ind⊎ : {A : UU l₁} {B : UU l₂} {P : A ⊎ B → UU l₃}
+ind⊎ : {A : UU ℓ₁} {B : UU ℓ₂} {P : A ⊎ B → UU ℓ₃}
   → ((x : A) → P (inl x))
   → ((y : B) → P (inr y))
   → (z : A ⊎ B) → P z
@@ -51,20 +52,20 @@ ind⊎ f g (inl x) = f x
 
 ind⊎ f g (inr y) = g y
 
-[_,_] : {A : UU l₁} {B : UU l₂} {P : A ⊎ B → UU l₃}
+[_,_] : {A : UU ℓ₁} {B : UU ℓ₂} {P : A ⊎ B → UU ℓ₃}
   → ((x : A) → P (inl x))
   → ((y : B) → P (inr y))
   → (z : A ⊎ B) → P z
 [ f , g ] = ind⊎ f g
 
-_⊎ᶠ_ : {A : UU l₁} {A' : UU l₂} {B : UU l₃ } {B' : UU l₄}
+_⊎ᶠ_ : {A : UU ℓ₁} {A' : UU ℓ₂} {B : UU ℓ₃ } {B' : UU ℓ₄}
   → (f : A → A') (g : B → B') → A ⊎ B → A' ⊎ B'
 (f ⊎ᶠ g) (inl x) = inl (f x)
 (f ⊎ᶠ g) (inr y) = inr (g y)
 
 -- 4.5 THe type of integers
 
-ℤ = ℕ ⊎ (𝟏 ⊎ ℕ)
+ℤ = ℕ ⊎ (𝟙 ⊎ ℕ)
 
 in-pos : ℕ → ℤ
 in-pos = inr ∘ inr
@@ -73,69 +74,70 @@ in-neg : ℕ → ℤ
 in-neg = inl
 
 -1ℤ : ℤ
--1ℤ = in-neg 0ℕ
+-1ℤ = in-neg zero
 
 0ℤ : ℤ
 0ℤ = inr (inl ＊)
 
 1ℤ : ℤ
-1ℤ = in-pos 0ℕ
+1ℤ = in-pos zero
 
-indℤ : {P : ℤ → UU l₁}
+indℤ : {P : ℤ → UU ℓ₁}
   → P -1ℤ
-  → ((n : ℕ) → P (in-neg n) → P (in-neg (succℕ n)))
+  → ((n : ℕ) → P (in-neg n) → P (in-neg (suc n)))
   → P 0ℤ
   → P 1ℤ
-  → ((n : ℕ) → P (in-pos n) → P (in-pos (succℕ n)))
+  → ((n : ℕ) → P (in-pos n) → P (in-pos (suc n)))
   → (k : ℤ) → P k
-indℤ p-1 p-s p0 p1 ps (inl 0ℕ) = p-1
-indℤ p-1 p-s p0 p1 ps (inl (succℕ n))
+indℤ p-1 p-s p0 p1 ps (inl zero) = p-1
+indℤ p-1 p-s p0 p1 ps (inl (suc n))
   = p-s n (indℕ p-1 p-s n)
 indℤ p-1 p-s p0 p1 ps (inr (inl ＊)) = p0
-indℤ p-1 p-s p0 p1 ps (inr (inr 0ℕ)) = p1
-indℤ p-1 p-s p0 p1 ps (inr (inr (succℕ n)))
+indℤ p-1 p-s p0 p1 ps (inr (inr zero)) = p1
+indℤ p-1 p-s p0 p1 ps (inr (inr (suc n)))
   = ps n (indℕ p1 ps n)
 
 succℤ : ℤ → ℤ
-succℤ (inl 0ℕ) = 0ℤ
-succℤ (inl (succℕ n)) = in-neg n
+succℤ (inl zero) = 0ℤ
+succℤ (inl (suc n)) = in-neg n
 succℤ (inr (inl ＊)) = 1ℤ
-succℤ (inr (inr n)) = in-pos (succℕ n)
+succℤ (inr (inr n)) = in-pos (suc n)
 
 -- 4.6 Dependent pair types
+infixr 4 _,_
+record Σ (A : UU ℓ₁) (B : A → UU ℓ₂) : UU (ℓ₁ ⊔ ℓ₂) where
+  constructor _,_
+  field
+    pr₁ : A
+    pr₂ : B pr₁
+open Σ public
+{-# BUILTIN SIGMA Σ #-}
 
-data Σ (A : UU l₁) (B : A → UU l₂) : UU (l₁ ⊔ l₂) where
-  _,_ : (x : A) → B x → Σ A B
-infixr 4  _,_
-syntax Σ A (λ x → b) = Σ x ∶ A , b
+Σ-syntax : (A : UU ℓ₁) (B : A → UU ℓ₂) → UU (ℓ₁ ⊔ ℓ₂)
+Σ-syntax = Σ
 
-indΣ : {A : UU l₁} {B : A → UU l₂} {P : Σ x ∶ A , B x → UU l₃}
+infix 2 Σ-syntax
+syntax Σ-syntax A (λ x → b) = Σ[ x ∈ A ] b
+
+indΣ : {A : UU ℓ₁} {B : A → UU ℓ₂} {P : Σ[ x ∈ A ] B x → UU ℓ₃}
   → ((x : A) (y : B x) → P (x , y))
-  → (z : Σ x ∶ A , B x) → P z
+  → (z : Σ[ x ∈ A ] B x) → P z
 indΣ f (x , y) = f x y
-
-pr₁ : {A : UU l₁} {B : A → UU l₂}
-  → Σ x ∶ A , B x → A
-pr₁ (x , y) = x
-
-pr₂ : {A : UU l₁} {B : A → UU l₂}
-  → (p : Σ x ∶ A , B x) → B (pr₁ p)
-pr₂ (x , y) = y
 
 curry = indΣ
 
-ev-pair : {A : UU l₁} {B : A → UU l₂} {P : Σ x ∶ A , B x → UU l₃}
-  → ((z : Σ x ∶ A , B x) → P z)
+ev-pair : {A : UU ℓ₁} {B : A → UU ℓ₂} {P : Σ[ x ∈ A ] B x → UU ℓ₃}
+  → ((z : Σ[ x ∈ A ] B x) → P z)
   → (x : A) (y : B x) → P (x , y)
 ev-pair f x y = f (x , y)
 
 uncurry = ev-pair
 
-_×_ : (A : UU l₁) (B : UU l₂) → UU (l₁ ⊔ l₂)
-A × B = Σ x ∶ A , B
 infixr 2 _×_
+_×_ : (A : UU ℓ₁) (B : UU ℓ₂) → UU (ℓ₁ ⊔ ℓ₂)
+A × B = Σ[ x ∈ A ] B
 
-ind× : {A : UU l₁} {B : UU l₂} {P : A × B → UU l₃}
+ind× : {A : UU ℓ₁} {B : UU ℓ₂} {P : A × B → UU ℓ₃}
   → ((x : A) (y : B) → P (x , y))
   → (z : A × B) → P z
 ind× f (x , y) = f x y
@@ -143,132 +145,131 @@ ind× f (x , y) = f x y
 -- Exercises
 
 predℤ : ℤ → ℤ
-predℤ (inl n) = in-neg (succℕ n)
-predℤ (inr (inl ＊)) = in-neg 0ℕ
-predℤ (inr (inr 0ℕ)) = 0ℤ
-predℤ (inr (inr (succℕ n))) = in-pos n
+predℤ (inl n) = in-neg (suc n)
+predℤ (inr (inl ＊)) = in-neg zero
+predℤ (inr (inr zero)) = 0ℤ
+predℤ (inr (inr (suc n))) = in-pos n
 
 addℤ : ℤ → ℤ → ℤ
-addℤ (inl m) (inl n) = inl (succℕ (m + n))
+addℤ (inl m) (inl n) = inl (suc (m + n))
 addℤ (inl m) (inr (inl ＊)) = inl m
-addℤ (inl 0ℕ) (inr (inr 0ℕ)) = inr (inl ＊)
-addℤ (inl 0ℕ) (inr (inr (succℕ n))) = inr (inr n)
-addℤ (inl (succℕ m)) (inr (inr 0ℕ)) = inl m
-addℤ (inl (succℕ m)) (inr (inr (succℕ n))) = addℤ (inl m) (inr (inr n))
+addℤ (inl zero) (inr (inr zero)) = inr (inl ＊)
+addℤ (inl zero) (inr (inr (suc n))) = inr (inr n)
+addℤ (inl (suc m)) (inr (inr zero)) = inl m
+addℤ (inl (suc m)) (inr (inr (suc n))) = addℤ (inl m) (inr (inr n))
 addℤ (inr (inl ＊)) (inl n) = inl n
-addℤ (inr (inr 0ℕ)) (inl 0ℕ) = inr (inl ＊)
-addℤ (inr (inr (succℕ m))) (inl 0ℕ) = inr (inr m)
-addℤ (inr (inr 0ℕ)) (inl (succℕ n)) = inl n
-addℤ (inr (inr (succℕ m))) (inl (succℕ n)) = addℤ (inr (inr m)) (inl n)
+addℤ (inr (inr zero)) (inl zero) = inr (inl ＊)
+addℤ (inr (inr (suc m))) (inl zero) = inr (inr m)
+addℤ (inr (inr zero)) (inl (suc n)) = inl n
+addℤ (inr (inr (suc m))) (inl (suc n)) = addℤ (inr (inr m)) (inl n)
 addℤ (inr (inl ＊)) (inr (inl ＊)) = inr (inl ＊)
 addℤ (inr (inl ＊)) (inr (inr n)) = inr (inr n)
 addℤ (inr (inr m)) (inr (inl ＊)) = inr (inr m)
-addℤ (inr (inr m)) (inr (inr n)) = inr (inr (succℕ (m + n)))
+addℤ (inr (inr m)) (inr (inr n)) = inr (inr (suc (m + n)))
 
 negℤ : ℤ → ℤ
 negℤ (inl n) = in-pos n
 negℤ (inr (inl ＊)) = 0ℤ
 negℤ (inr (inr n)) = in-neg n
 
-data bool : UU where
-  false : bool
-  true : bool
+data Bool : UU where
+  false true : Bool
 
-ind-bool : {P : bool → UU l₁}
+ind-Bool : {P : Bool → UU ℓ₁}
   → P false
   → P true
-  → (x : bool) → P x
-ind-bool pf pt false = pf
-ind-bool pf pt true  = pt
+  → (x : Bool) → P x
+ind-Bool pf pt false = pf
+ind-Bool pf pt true  = pt
 
-neg-bool : bool → bool
-neg-bool false = true
-neg-bool true = false
+neg-Bool : Bool → Bool
+neg-Bool false = true
+neg-Bool true = false
 
-_∧_ : bool → bool → bool
+_∧_ : Bool → Bool → Bool
 false ∧ q = false
 true ∧ q = q
 
-_∨_ : bool → bool → bool
+_∨_ : Bool → Bool → Bool
 false ∨ q = q
 true ∨ q = true
 
-_↔_ : UU l₁ → UU l₂ → UU (l₁ ⊔ l₂)
+_↔_ : UU ℓ₁ → UU ℓ₂ → UU (ℓ₁ ⊔ ℓ₂)
 A ↔ B = (A → B) × (B → A)
 infixl 3 _↔_
 
-4-3a1 : {P : UU l₁}
+4-3a1 : {P : UU ℓ₁}
   → ¬ (P × ¬ P)
 4-3a1 (P , ¬P) = ¬P P
 
-4-3a2 : {P : UU l₁}
+4-3a2 : {P : UU ℓ₁}
   → ¬ (P ↔ ¬ P)
 4-3a2 {P = P} (P→¬P , ¬P→P) = P→¬P (¬P→P ¬P) (¬P→P ¬P)
   where
     ¬P : ¬ P
     ¬P P = P→¬P P P
 
-4-3b1 : {P : UU l₁}
+4-3b1 : {P : UU ℓ₁}
   → P → ¬¬ P
 4-3b1 P ¬P = ¬P P
 
-4-3b2 : {P Q : UU l₁}
+4-3b2 : {P Q : UU ℓ₁}
   → (P → Q) → (¬¬ P → ¬¬ Q)
 4-3b2 P→Q ¬¬P ¬Q = ¬¬P (λ P → ¬Q (P→Q P))
 
-4-3b3 : {P Q : UU l₁}
+4-3b3 : {P Q : UU ℓ₁}
   → (P → ¬¬ Q) → (¬¬ P → ¬¬ Q)
 4-3b3 P→¬¬Q ¬¬P ¬Q = ¬¬P (λ P → P→¬¬Q P ¬Q)
 
-4-3c1 : {P : UU l₁}
+4-3c1 : {P : UU ℓ₁}
   → ¬¬ (¬¬ P → P)
-4-3c1 ¬[¬¬P→P] = ¬[¬¬P→P] (λ ¬¬P → indΦ (¬¬P (λ P → ¬[¬¬P→P] λ _ → P)))
+4-3c1 ¬[¬¬P→P] = ¬[¬¬P→P] (λ ¬¬P → ind𝟘 (¬¬P (λ P → ¬[¬¬P→P] λ _ → P)))
 
-data list (A : UU l₁) : UU l₁ where
+data list (A : UU ℓ₁) : UU ℓ₁ where
   nil : list A
   cons : A → list A → list A
 
-ind-list : {A : UU l₁} {P : list A → UU l₂}
+ind-list : {A : UU ℓ₁} {P : list A → UU ℓ₂}
   → P nil
   → ((a : A) (as : list A) → P as → P (cons a as))
   → (as : list A) → P as
 ind-list pnil pcons nil = pnil
 ind-list pnil pcons (cons a as) = pcons a as (ind-list pnil pcons as)
 
-fold-list : {A : UU l₁} {B : UU l₂}
+fold-list : {A : UU ℓ₁} {B : UU ℓ₂}
   → B
   → (A → B → B)
   → list A → B
 fold-list b μ nil = b
 fold-list b μ (cons a as) = μ a (fold-list b μ as)
 
-map-list : {A : UU l₁} {B : UU l₂}
+map-list : {A : UU ℓ₁} {B : UU ℓ₂}
   → (A → B)
   → list A → list B
 map-list f = fold-list nil (λ a bs → cons (f a) bs)
 
-length-list : {A : UU l₁}
+length-list : {A : UU ℓ₁}
   → list A → ℕ
-length-list = fold-list 0ℕ (const succℕ)
+length-list = fold-list zero (const suc)
 
 sum-list : list ℕ → ℕ
-sum-list = fold-list 0ℕ _+_
+sum-list = fold-list zero _+_
 
 product-list : list ℕ → ℕ
-product-list = fold-list (succℕ 0ℕ) _*_
+product-list = fold-list (suc zero) _*_
 
-concat-list : {A : UU l₁}
+concat-list : {A : UU ℓ₁}
   → list A → list A → list A
 concat-list nil as' = as'
 concat-list (cons a as) as' = cons a (concat-list as as')
 
 _++_ = concat-list
 
-flatten-list : {A : UU l₁}
+flatten-list : {A : UU ℓ₁}
   → list (list A) → list A
 flatten-list = fold-list nil concat-list
 
-reverse-list : {A : UU l₁}
+reverse-list : {A : UU ℓ₁}
   → list A → list A
 reverse-list nil = nil
 reverse-list (cons a as) = (reverse-list as) ++ (cons a nil)

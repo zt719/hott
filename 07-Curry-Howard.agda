@@ -5,7 +5,7 @@ open import 06-Universes public
 -- 7.1 The Curry-Howard interpretation
 
 _∣_ : (d n : ℕ) → UU₀
-d ∣ n = Σ k ∶ ℕ , (d * k ≡ n)
+d ∣ n = Σ[ k ∈ ℕ ] (d * k ≡ n)
 
 three-divides-six : 3 ∣ 6
 three-divides-six = 2 , refl 6
@@ -29,20 +29,20 @@ p7-1-5 x y d ((k , d*k≡x) , (l , d*l≡y)) = k + l , α ∙ β ∙ γ
 
 -- 7.2 The congruence relations on ℕ
 
-is-refl-R : {A : UU l₁}
-  → (R : A → A → UU l₂) → UU (l₁ ⊔ l₂)
+is-refl-R : {A : UU ℓ₁}
+  → (R : A → A → UU ℓ₂) → UU (ℓ₁ ⊔ ℓ₂)
 is-refl-R R = (x : _) → R x x
 
-is-sym-R : {A : UU l₁}
-  → (R : A → A → UU l₂) → UU (l₁ ⊔ l₂)
+is-sym-R : {A : UU ℓ₁}
+  → (R : A → A → UU ℓ₂) → UU (ℓ₁ ⊔ ℓ₂)
 is-sym-R R = (x y : _) → R x y → R y x
 
-is-trans-R : {A : UU l₁}
-  → (R : A → A → UU l₂) → UU (l₁ ⊔ l₂)
+is-trans-R : {A : UU ℓ₁}
+  → (R : A → A → UU ℓ₂) → UU (ℓ₁ ⊔ ℓ₂)
 is-trans-R R = (x y z : _) → R x y → R y z → R x z
 
-is-equiv-R : {A : UU l₁}
-  → (R : A → A → UU l₂) → UU (l₁ ⊔ l₂)
+is-equiv-R : {A : UU ℓ₁}
+  → (R : A → A → UU ℓ₂) → UU (ℓ₁ ⊔ ℓ₂)
 is-equiv-R R = is-refl-R R × is-sym-R R × is-trans-R R
 
 _≡_mod_ : ℕ → ℕ → ℕ → UU
@@ -50,91 +50,74 @@ x ≡ y mod k = k ∣ distℕ x y
 
 mod-refl : (k : ℕ)
   → is-refl-R (_≡_mod k)
-mod-refl k x = 0ℕ , right-unit-* k ∙ distℕ-refl x
+mod-refl k x = zero , right-unit-* k ∙ distℕ-refl x
 
 mod-sym : (k : ℕ)
   → is-sym-R (_≡_mod k)
 mod-sym k x y (l , k*l≡distℕxy) = l , k*l≡distℕxy ∙ distℕ-sym x y
 
 postulate
-  mod-trans : (k : ℕ)
-    → is-trans-R (_≡_mod k)
+  mod-trans : (k : ℕ) → is-trans-R (_≡_mod k)
 
-mod-equiv : (k : ℕ)
-  → is-equiv-R (_≡_mod k)
+mod-equiv : (k : ℕ) → is-equiv-R (_≡_mod k)
 mod-equiv k = mod-refl k , mod-sym k , mod-trans k
 
 -- 7.3 The standard finite types
 
 classical-Fin : ℕ → UU
-classical-Fin k = Σ x ∶ ℕ , (x < k)
+classical-Fin k = Σ[ x ∈ ℕ ] (x < k)
 
 Fin' : ℕ → UU
-Fin' 0ℕ = Φ
-Fin' (succℕ k) = Fin' k ⊎ 𝟏
+Fin' zero = 𝟘
+Fin' (suc k) = Fin' k ⊎ 𝟙
 
-pt' : {k : ℕ}
-  → Fin' (succℕ k)
-pt' = inr ＊
+zero' : {k : ℕ}
+  → Fin' (suc k)
+zero' = inr ＊
 
-𝓲' : {k : ℕ}
-  → Fin' k → Fin' (succℕ k)
-𝓲' = inl
+suc' : {k : ℕ}
+  → Fin' k → Fin' (suc k)
+suc' = inl
 
 ι' : (k : ℕ)
   → Fin' k → ℕ
-ι' (succℕ k) (inl x) = ι' k x
-ι' (succℕ k) (inr ＊) = k
+ι' (suc k) (inl x) = ι' k x
+ι' (suc k) (inr ＊) = k
 
 data Fin : ℕ → UU where
-  pt : {k : ℕ} → Fin (succℕ k)
-  𝓲  : {k : ℕ} → Fin k → Fin (succℕ k)
+  zero : {k : ℕ} → Fin (suc k)
+  suc  : {k : ℕ} → Fin k → Fin (suc k)
 
-ind-Fin : {P : {k : ℕ} → Fin k → UU l₁}
-  → (g : (k : ℕ) (x : Fin k) → P {k} x → P {succℕ k} (𝓲 x))
-  → (p : (k : ℕ) → P {succℕ k} pt)
+ind-Fin : {P : {k : ℕ} → Fin k → UU ℓ₁}
+  → (g : (k : ℕ) (x : Fin k) → P {k} x → P {suc k} (suc x))
+  → (p : (k : ℕ) → P {suc k} zero)
   → {k : ℕ} (x : Fin k) → P {k} x
-ind-Fin g p {succℕ k} pt    = p k
-ind-Fin g p {succℕ k} (𝓲 x) = g k x (ind-Fin g p {k} x)
+ind-Fin g p {suc k} zero    = p k
+ind-Fin g p {suc k} (suc x) = g k x (ind-Fin g p {k} x)
 
 ι : {k : ℕ} → Fin k → ℕ
-ι {succℕ k} pt = k
-ι {succℕ k} (𝓲 x) = ι {k} x
+ι {suc k} zero = k
+ι {suc k} (suc x) = ι {k} x
 
 ι-inj : {k : ℕ}
   → (x y : Fin k)
   → ι {k} x ≡ ι {k} y → x ≡ y
-ι-inj pt pt p = refl pt
-ι-inj pt (𝓲 y) p = ex-falso (g p)
+ι-inj zero zero p = refl zero
+ι-inj zero (suc y) p = ex-falso (g p)
   where
     postulate
       g : {k : ℕ} {y : Fin k}
-        → ι {succℕ k} pt ≢ ι {succℕ k} (𝓲 y)
-ι-inj (𝓲 x) pt p = ex-falso (f p)
+        → ι {suc k} zero ≢ ι {suc k} (suc y)
+ι-inj (suc x) zero p = ex-falso (f p)
   where
     postulate
       f : {k : ℕ} {x : Fin k}
-        → ι {succℕ k} (𝓲 x) ≢ ι {succℕ k} pt
-ι-inj (𝓲 x) (𝓲 y) p = ap 𝓲 (ι-inj x y p)
+        → ι {suc k} (suc x) ≢ ι {suc k} zero
+ι-inj (suc x) (suc y) p = ap suc (ι-inj x y p)
 
 -- 7.4 The natrual numbers modulo k+1
 
-is-split-surjective : {A : UU l₁} {B : UU l₂}
-  → (A → B) → UU (l₁ ⊔ l₂)
+is-split-surjective : {A : UU ℓ₁} {B : UU ℓ₂}
+  → (A → B) → UU (ℓ₁ ⊔ ℓ₂)
 is-split-surjective f
-  = (b : _) → Σ a ∶ _ , (f a ≡ b)
-
-zero : {k : ℕ}
-  → Fin (succℕ k)
-zero {0ℕ} = pt
-zero {succℕ k} = 𝓲 (zero {k})
-
-skip-zero : {k : ℕ}
-  → Fin k → Fin (succℕ k)
-skip-zero {succℕ k} pt = pt
-skip-zero {succℕ k} (𝓲 x) = 𝓲 (skip-zero {k} x)
-
-succ : {k : ℕ}
-  → Fin k → Fin k
-succ {succℕ k} pt = zero {k}
-succ {succℕ k} (𝓲 x) = skip-zero {k} x
+  = (b : _) → Σ[ a ∈ _ ] (f a ≡ b)
